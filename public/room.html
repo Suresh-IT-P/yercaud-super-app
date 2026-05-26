@@ -30,7 +30,9 @@
             margin-bottom: 20px;
             background: linear-gradient(to right, var(--text-main), var(--primary-dark));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            color: transparent;
         }
         .rooms-list {
             display: flex;
@@ -44,16 +46,16 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            background: rgba(22, 33, 62, 0.85);
+            border: 1px solid rgba(226, 176, 74, 0.1);
             border-radius: 20px;
             transition: all 0.4s ease;
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
         }
         .room-card-large:hover {
             transform: translateY(-4px);
-            border-color: rgba(34, 197, 94, 0.4);
-            box-shadow: 0 15px 40px rgba(34, 197, 94, 0.08);
+            border-color: rgba(226, 176, 74, 0.3);
+            box-shadow: 0 15px 40px rgba(226, 176, 74, 0.08);
         }
         @media (min-width: 850px) {
             .room-card-large {
@@ -102,8 +104,8 @@
             padding: 0 20px 100px;
         }
         .room-card-mini {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            background: rgba(22, 33, 62, 0.85);
+            border: 1px solid rgba(226, 176, 74, 0.08);
             border-radius: 20px;
             overflow: hidden;
             cursor: pointer;
@@ -114,7 +116,7 @@
         .room-card-mini:hover {
             transform: translateY(-5px);
             border-color: var(--primary);
-            box-shadow: 0 15px 30px rgba(34,197,94,0.12);
+            box-shadow: 0 15px 30px rgba(226, 176, 74, 0.12);
         }
         .room-mini-img {
             height: 220px;
@@ -139,7 +141,7 @@
             width: 100%;
             padding: 10px;
             border-radius: 8px;
-            background: #f1f5f9;
+            background: rgba(226, 176, 74, 0.08);
             color: var(--text-main);
             border: none;
             font-weight: 600;
@@ -161,8 +163,8 @@
             flex-direction: column;
             gap: 15px;
             padding: 20px;
-            background: #fdfdfd;
-            border-right: 1px solid #f1f5f9;
+            background: rgba(13, 13, 13, 0.4);
+            border-right: 1px solid rgba(226, 176, 74, 0.08);
         }
         .main-img-container {
             width: 100%;
@@ -260,8 +262,8 @@
             flex-wrap: wrap;
             gap: 20px;
             padding: 20px 0;
-            border-top: 1px solid #f1f5f9;
-            border-bottom: 1px solid #f1f5f9;
+            border-top: 1px solid rgba(226, 176, 74, 0.1);
+            border-bottom: 1px solid rgba(226, 176, 74, 0.1);
             margin-bottom: 25px;
             color: var(--text-muted);
             font-size: 0.95rem;
@@ -284,7 +286,7 @@
             margin-top: auto;
             text-align: right;
             padding-top: 20px;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid rgba(226, 176, 74, 0.1);
         }
     </style>
 </head>

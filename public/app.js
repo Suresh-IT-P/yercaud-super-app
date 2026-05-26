@@ -1,113 +1,150 @@
-// --- Optimized 3D Flying Hills Animation ---
+// --- Ultra-Optimized 3D Flying Hills Animation ---
 const canvas = document.getElementById('polyCanvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d', { alpha: false });
 
-let width, height;
+let width, height, canvasW, canvasH;
 let time = 0;
-
-// Optimized Grid configuration
 let cols, rows, scale;
 let verticalGradient;
+let isVisible = true;
+let lastFrame = 0;
+const FPS_INTERVAL = 1000 / 30; // Cap at 30fps — smooth enough for a background
 
-function resize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-    
-    // Dynamically scale resolution based on device for performance
-    if (width < 768) {
-        cols = 16;
-        rows = 25;
-        scale = 90;
-    } else {
-        cols = 35;
-        rows = 35;
-        scale = 80;
-    }
-    
-    // Pre-calculate gradient for vertical lines (HUGE performance boost)
-    // instead of creating it 60 times a second
-    verticalGradient = ctx.createLinearGradient(width/2, height, width/2, height/2 - 150);
-    verticalGradient.addColorStop(0, 'rgba(34, 197, 94, 0.4)');
-    verticalGradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+// Pre-compute sin/cos lookup table (eliminates ~2000 Math calls per frame)
+const LUT_SIZE = 1024;
+const sinLUT = new Float32Array(LUT_SIZE);
+const cosLUT = new Float32Array(LUT_SIZE);
+for (let i = 0; i < LUT_SIZE; i++) {
+    const angle = (i / LUT_SIZE) * Math.PI * 8; // covers 0..8π range
+    sinLUT[i] = Math.sin(angle);
+    cosLUT[i] = Math.cos(angle);
+}
+function fastSin(v) {
+    const idx = ((v % (Math.PI * 8)) + Math.PI * 8) / (Math.PI * 8) * LUT_SIZE;
+    return sinLUT[((idx | 0) % LUT_SIZE + LUT_SIZE) % LUT_SIZE];
+}
+function fastCos(v) {
+    const idx = ((v % (Math.PI * 8)) + Math.PI * 8) / (Math.PI * 8) * LUT_SIZE;
+    return cosLUT[((idx | 0) % LUT_SIZE + LUT_SIZE) % LUT_SIZE];
 }
 
-function animate() {
-    ctx.clearRect(0, 0, width, height);
-    time -= 0.03; // Smooth fly speed
-    
+// Pause when tab is hidden
+document.addEventListener('visibilitychange', () => { isVisible = !document.hidden; });
+
+// Debounced resize
+let resizeTimer;
+function onResize() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 150);
+}
+
+function resize() {
+    // Render at half resolution for massive GPU savings, CSS scales it up
+    const dpr = Math.min(window.devicePixelRatio || 1, 1); // cap at 1x
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvasW = canvas.width = Math.round(width * 0.5);  // half-res buffer
+    canvasH = canvas.height = Math.round(height * 0.5);
+    canvas.style.width = width + 'px';   // stretch to full viewport
+    canvas.style.height = height + 'px';
+    ctx.setTransform(0.5, 0, 0, 0.5, 0, 0);
+
+    if (width < 768) {
+        cols = 12; rows = 18; scale = 100;
+    } else {
+        cols = 22; rows = 22; scale = 90;
+    }
+
+    verticalGradient = ctx.createLinearGradient(width / 2, height, width / 2, height / 2 - 150);
+    verticalGradient.addColorStop(0, 'rgba(226, 176, 74, 0.3)');
+    verticalGradient.addColorStop(1, 'rgba(226, 176, 74, 0)');
+}
+
+// Pre-allocate row opacity array
+let rowOpacities;
+function precalcOpacities() {
+    rowOpacities = new Float32Array(rows);
+    for (let y = 0; y < rows; y++) {
+        rowOpacities[y] = Math.max(0, 1 - y / (rows - 4));
+    }
+}
+
+function animate(timestamp) {
+    requestAnimationFrame(animate);
+
+    // Skip if tab hidden
+    if (!isVisible) return;
+
+    // Throttle to 30fps
+    const delta = timestamp - lastFrame;
+    if (delta < FPS_INTERVAL) return;
+    lastFrame = timestamp - (delta % FPS_INTERVAL);
+
+    // Clear with dark fill (faster than clearRect on opaque canvas)
+    ctx.fillStyle = '#0d0d0d';
+    ctx.fillRect(0, 0, width, height);
+
+    time -= 0.025;
     const fov = width * 0.8;
     const cameraZ = 250;
-    const startX = - (cols * scale) / 2;
-    
-    // 1. Draw Horizontal Lines (Rows)
+    const startX = -(cols * scale) / 2;
+    const halfW = width / 2;
+    const baseY = height / 2.2;
+
+    // 1. Horizontal lines — one beginPath per row
+    ctx.lineWidth = 1;
     for (let y = 0; y < rows - 1; y++) {
-        let z3d = y * scale;
-        const opacity = 1 - (y / (rows - 5));
-        
-        // Performance skip: don't render invisible distant lines
-        if (opacity <= 0) continue; 
-        
+        const op = rowOpacities[y];
+        if (op <= 0) continue;
+
+        const z3d = y * scale;
+        const yOff = time + y * 0.15;
+        const z = z3d + cameraZ;
+        const sf = fov / z;
+
         ctx.beginPath();
-        let yOff = time + (y * 0.15);
-        
         for (let x = 0; x < cols; x++) {
-            let x3d = startX + x * scale;
-            let xOff = x * 0.15;
-            
-            // Calculate height on the fly (saves memory/loops)
-            let y3d = Math.sin(xOff) * Math.cos(yOff) * 140 + Math.sin(xOff * 0.4) * 70;
-            
-            // Project 3D to 2D Screen Space
-            let z = z3d + cameraZ;
-            let scaleFactor = fov / z;
-            let xProj = (x3d * scaleFactor) + (width / 2);
-            let yProj = ((y3d + 200) * scaleFactor) + (height / 2.2);
-            
-            if (x === 0) ctx.moveTo(xProj, yProj);
-            else ctx.lineTo(xProj, yProj);
+            const x3d = startX + x * scale;
+            const xOff = x * 0.15;
+            const h = fastSin(xOff) * fastCos(yOff) * 140 + fastSin(xOff * 0.4) * 70;
+            const px = x3d * sf + halfW;
+            const py = (h + 200) * sf + baseY;
+            x === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
         }
-        ctx.strokeStyle = `rgba(34, 197, 94, ${opacity * 0.6})`;
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = `rgba(226,176,74,${(op * 0.45).toFixed(2)})`;
         ctx.stroke();
     }
-    
-    // 2. Draw Vertical Lines (Columns) - Batched into a single stroke!
+
+    // 2. Vertical lines — single batched stroke
     ctx.beginPath();
     for (let x = 0; x < cols; x++) {
-        let x3d = startX + x * scale;
-        let xOff = x * 0.15;
-        
+        const x3d = startX + x * scale;
+        const xOff = x * 0.15;
+        const sinX = fastSin(xOff);
+        const sinX4 = fastSin(xOff * 0.4) * 70;
+
         for (let y = 0; y < rows - 1; y++) {
-            let z3d = y * scale;
-            if (1 - (y / (rows - 5)) <= 0) break; // Performance skip
-            
-            let yOff = time + (y * 0.15);
-            let y3d = Math.sin(xOff) * Math.cos(yOff) * 140 + Math.sin(xOff * 0.4) * 70;
-            
-            let z = z3d + cameraZ;
-            let scaleFactor = fov / z;
-            let xProj = (x3d * scaleFactor) + (width / 2);
-            let yProj = ((y3d + 200) * scaleFactor) + (height / 2.2);
-            
-            if (y === 0) ctx.moveTo(xProj, yProj);
-            else ctx.lineTo(xProj, yProj);
+            if (rowOpacities[y] <= 0) break;
+            const z = y * scale + cameraZ;
+            const sf = fov / z;
+            const h = sinX * fastCos(time + y * 0.15) * 140 + sinX4;
+            const px = x3d * sf + halfW;
+            const py = (h + 200) * sf + baseY;
+            y === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
         }
     }
-    // Apply pre-calculated gradient and execute a single stroke for all columns
     ctx.strokeStyle = verticalGradient;
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1;
     ctx.stroke();
-    
-    requestAnimationFrame(animate);
 }
 
 function initAnimation() {
     resize();
-    window.addEventListener('resize', resize);
-    animate();
+    precalcOpacities();
+    window.addEventListener('resize', () => { onResize(); setTimeout(precalcOpacities, 200); });
+    requestAnimationFrame(animate);
 }
 
-// Start animation
 initAnimation();
 
 

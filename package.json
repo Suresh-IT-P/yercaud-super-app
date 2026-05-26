@@ -1,0 +1,15 @@
+{
+  "name": "y360-landing",
+  "version": "1.0.0",
+  "description": "Y360 — Yercaud Tourism Landing Page (Serverless)",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "nodemailer": "^8.0.5"
+  }
+}

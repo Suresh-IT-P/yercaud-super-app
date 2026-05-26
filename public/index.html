@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book&Sync | The Complete Yercaud Experience</title>
+    
+    <!-- Core SEO Meta Tags -->
+    <meta name="description" content="Book&Sync is your ultimate Yercaud travel super app. Book luxury stays, homestays, hill cabs, custom trip itineraries, and romantic love proposals in the Jewel of the South.">
+    <meta name="keywords" content="Yercaud tourism, Yercaud resorts, Yercaud cab booking, Yercaud trip planner, homestays in Yercaud, Yercaud love proposal, Book&Sync Yercaud">
+    <meta name="author" content="Book&Sync">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Book&Sync | The Complete Yercaud Experience">
+    <meta property="og:description" content="Book luxury stays, hill cabs, custom trip itineraries, and romantic love proposals in Yercaud.">
+    <meta property="og:url" content="https://yercaud.bookandsync.com">
+    <meta property="og:image" content="https://yercaud.bookandsync.com/img/hero.png">
+    
+    <!-- Structured Data (JSON-LD) for Google Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TravelAgency",
+      "name": "Book&Sync Yercaud",
+      "description": "Premium gateway to stays, dining, cabs, and curated experiences in Yercaud.",
+      "url": "https://yercaud.bookandsync.com",
+      "areaServed": {
+        "@type": "City",
+        "name": "Yercaud"
+      }
+    }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <!-- Polygon Animation Canvas -->
+    <div id="canvas-container">
+        <canvas id="polyCanvas"></canvas>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-content">
+            <div class="logo">
+                <h2>Book&Sync</h2>
+            </div>
+            <div class="nav-links">
+                <a href="trip-planner.html" class="btn btn-primary" style="text-decoration:none;">Plan Trip</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header>
+        <div class="hero-container">
+            <div class="hero-content glass-panel">
+                <h1>Discover Yercaud Like Never Before</h1>
+                <p>Your premium gateway to stays, dining, cabs, and curated experiences in the Jewel of the South.</p>
+                <div class="hero-buttons">
+                    <a href="room.html" class="btn btn-primary" style="text-decoration:none;">View Rooms</a>
+                    <button class="btn btn-outline" onclick="openModal('taxi')">Hire a Cab</button>
+                </div>
+            </div>
+            
+            <!-- Image Slideshow -->
+            <div class="hero-slideshow-wrapper">
+                <img class="hero-slide active" src="img/gallery_resort.png" alt="Luxury Resort in Yercaud">
+                <img class="hero-slide" src="img/resort.png" alt="Cozy Homestay">
+                <img class="hero-slide" src="img/r1.jpeg" alt="Yercaud Central Rooms">
+            </div>
+        </div>
+    </header>
+
+    <!-- Services Section -->
+    <section id="services">
+        <div class="section-header">
+            <h2>Our Premium Services</h2>
+            <p>Everything you need for the perfect getaway</p>
+        </div>
+        
+        <div class="services-grid">
+            <div class="glass-card service-card" onclick="window.location.href='room.html'" style="cursor: pointer;">
+                <div class="service-icon">🏨</div>
+                <h3>Luxury Stays</h3>
+                <p>From misty resorts to cozy homestays, find the perfect place to unwind.</p>
+            </div>
+            
+            <div class="glass-card service-card" onclick="openModal('taxi')" style="cursor: pointer;">
+                <div class="service-icon">🚕</div>
+                <h3>Hill Cabs</h3>
+                <p>Safe, reliable, and scenic tours with our verified local drivers.</p>
+            </div>
+
+            <div class="glass-card service-card" onclick="window.location.href='trip-planner.html'" style="cursor: pointer;">
+                <div class="service-icon">🗺️</div>
+                <h3>Trip Planner</h3>
+                <p>Let our experts craft a personalized itinerary for your group.</p>
+            </div>
+
+            <div class="glass-card service-card" onclick="openModal('proposal')" style="cursor: pointer;">
+                <div class="service-icon">💍</div>
+                <h3>Love Proposal</h3>
+                <p>Romantic setups, candlelight dinners, and breathtaking views for the perfect moment.</p>
+            </div>
+
+            <div class="glass-card service-card" onclick="openModal('anniversary')" style="cursor: pointer;">
+                <div class="service-icon">🥂</div>
+                <h3>Wedding Anniversary</h3>
+                <p>Celebrate your milestones with curated experiences and premium hospitality.</p>
+            </div>
+
+            <div class="glass-card service-card" onclick="openModal('birthday')" style="cursor: pointer;">
+                <div class="service-icon">🎂</div>
+                <h3>Birthday Celebration</h3>
+                <p>Surprise parties, custom cakes, and fun-filled activities for unforgettable birthdays.</p>
+            </div>
+
+            <div class="glass-card service-card" onclick="openModal('custom')" style="cursor: pointer;">
+                <div class="service-icon">✨</div>
+                <h3>Custom Request</h3>
+                <p>Have something else in mind? Tell us your exact requirement and we will make it happen.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Modal -->
+    <div class="modal-overlay" id="bookingModal">
+        <div class="glass-panel modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2 id="modalTitle" style="margin-bottom: 20px;">Book a Service</h2>
+            
+            <form id="bookingForm" onsubmit="submitBooking(event)">
+                <input type="hidden" id="bookingType" name="type" value="">
+                
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" id="name" required placeholder="John Doe">
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" class="form-control" id="email" required placeholder="john@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" class="form-control" id="phone" required placeholder="+91 82206 79754">
+                </div>
+
+                <!-- Dynamic Fields Container -->
+                <div id="dynamicFields"></div>
+
+                <div class="form-group">
+                    <label>Description / Comments</label>
+                    <textarea class="form-control" id="notes" placeholder="Any special requests or comments?"></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary submit-btn" id="submitBtn">Send Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"></div>
+
+    <!-- Floating Call Button -->
+    <a href="tel:+918220679754" class="floating-call-btn" title="Call Us Now">
+        <i class="ph ph-phone-call"></i>
+    </a>
+
+    <script src="app.js"></script>
+</body>
+</html>

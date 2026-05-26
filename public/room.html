@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book&Sync | Luxury Stays & Rooms</title>
+    
+    <!-- Core SEO Meta Tags -->
+    <meta name="description" content="Discover the best luxury stays, resorts, and authentic homestays in Yercaud. Book premium suites with valley views or cozy cottages nestled in coffee plantations.">
+    <meta name="keywords" content="Yercaud hotels, Yercaud resorts, Yercaud homestays, luxury stay Yercaud, budget rooms Yercaud, coffee estate stay Yercaud">
+    <meta name="author" content="Book&Sync">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Book&Sync | Luxury Stays & Rooms in Yercaud">
+    <meta property="og:description" content="Discover the best luxury stays, resorts, and authentic homestays in Yercaud.">
+    <meta property="og:url" content="https://yercaud.bookandsync.com/room.html">
+    <meta property="og:image" content="https://yercaud.bookandsync.com/img/gallery_resort.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        .rooms-header {
+            padding: 120px 20px 60px;
+            text-align: center;
+        }
+        .rooms-header h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--text-main), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .rooms-list {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px 100px;
+        }
+        .room-card-large {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+        .room-card-large:hover {
+            transform: translateY(-4px);
+            border-color: rgba(34, 197, 94, 0.4);
+            box-shadow: 0 15px 40px rgba(34, 197, 94, 0.08);
+        }
+        @media (min-width: 850px) {
+            .room-card-large {
+                flex-direction: row;
+            }
+        }
+        @media (max-width: 849px) {
+            .rooms-header {
+                padding: 100px 15px 30px;
+            }
+            .rooms-header h1 {
+                font-size: 2.2rem;
+            }
+            .room-img-container {
+                flex: none;
+                height: 250px;
+            }
+            .room-img-container img {
+                min-height: auto;
+                height: 250px;
+            }
+            .room-content {
+                padding: 25px 20px;
+            }
+            .room-header h2 {
+                font-size: 1.8rem;
+            }
+            .amenities-grid {
+                grid-template-columns: 1fr;
+            }
+            .room-meta {
+                gap: 15px;
+                flex-direction: column;
+            }
+            .rooms-list {
+                gap: 40px;
+                padding: 0 15px 60px;
+            }
+        }
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px 100px;
+        }
+        .room-card-mini {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            text-align: center;
+        }
+        .room-card-mini:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(34,197,94,0.12);
+        }
+        .room-mini-img {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .room-mini-content {
+            padding: 25px 20px;
+        }
+        .room-mini-content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+            color: var(--text-main);
+        }
+        .room-mini-content p {
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        .room-mini-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: var(--text-main);
+            border: none;
+            font-weight: 600;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        .room-card-mini:hover .room-mini-btn {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        .back-btn-container {
+            max-width: 1100px;
+            margin: -20px auto 30px;
+            padding: 0 20px;
+        }
+        .room-gallery {
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 20px;
+            background: #fdfdfd;
+            border-right: 1px solid #f1f5f9;
+        }
+        .main-img-container {
+            width: 100%;
+            height: 350px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .main-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+        .thumbnail-row {
+            display: flex;
+            gap: 10px;
+            height: 80px;
+        }
+        .thumbnail {
+            flex: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            opacity: 0.6;
+        }
+        .thumbnail:hover, .thumbnail.active {
+            opacity: 1;
+            border-color: var(--primary);
+        }
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .room-content {
+            padding: 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .room-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+        .room-header h2 {
+            font-size: 2.2rem;
+            color: var(--text-main);
+            margin-bottom: 5px;
+        }
+        .room-price-large {
+            font-size: 1.6rem;
+            color: var(--primary-dark);
+            font-weight: 800;
+        }
+        .room-price-sub {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            display: block;
+        }
+        .room-desc {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+        }
+        .amenities-title {
+            color: var(--text-main);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        .amenity-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        .room-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px 0;
+            border-top: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 25px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        .meta-item i {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        .amenity-item i {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        .book-action {
+            margin-top: auto;
+            text-align: right;
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Polygon Animation Canvas -->
+    <div id="canvas-container">
+        <canvas id="polyCanvas"></canvas>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-content">
+            <div class="logo">
+                <a href="index.html" style="text-decoration:none;"><h2>Book&Sync</h2></a>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="btn btn-outline" style="text-decoration:none;">Back to Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Rooms Header -->
+    <header class="rooms-header">
+        <h1>Handpicked Stays in Yercaud</h1>
+        <p style="color: var(--text-muted); font-size: 1.2rem;">Discover comfort tailored to your style, from premium resorts to cozy forest homestays.</p>
+    </header>
+
+    <!-- Room Grid View -->
+    <section id="roomGridView" class="room-grid">
+        <div class="room-card-mini" onclick="viewRoom('room1')">
+            <img src="img/gallery_resort.png" alt="Misty Peak" class="room-mini-img">
+            <div class="room-mini-content">
+                <h3>Misty Peak Luxury Resort</h3>
+                <p>₹6,500 / night</p>
+                <button class="room-mini-btn">View Room Details</button>
+            </div>
+        </div>
+        
+        <div class="room-card-mini" onclick="viewRoom('room2')">
+            <img src="img/resort.png" alt="Silver Oak" class="room-mini-img">
+            <div class="room-mini-content">
+                <h3>Silver Oak Homestay</h3>
+                <p>₹3,200 / night</p>
+                <button class="room-mini-btn">View Room Details</button>
+            </div>
+        </div>
+
+        <div class="room-card-mini" onclick="viewRoom('room3')">
+            <img src="img/r1.jpeg" alt="Yercaud Central" class="room-mini-img">
+            <div class="room-mini-content">
+                <h3>Yercaud Central Hotel</h3>
+                <p>₹1,800 / night</p>
+                <button class="room-mini-btn">View Room Details</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rooms Detail View -->
+    <div id="roomDetailsView" style="display: none;">
+        <div class="back-btn-container">
+            <button class="btn btn-outline" onclick="backToRooms()" style="padding: 10px 20px; border-radius: 8px;"><i class="ph ph-arrow-left"></i> Back to All Rooms</button>
+        </div>
+        
+        <section class="rooms-list">
+            
+            <!-- Room 1 -->
+            <div class="room-card-large" id="room1" style="display: none;">
+            <div class="room-gallery">
+                <div class="main-img-container">
+                    <img src="img/gallery_resort.png" alt="Misty Peak Luxury Resort" id="mainImg1">
+                </div>
+                <div class="thumbnail-row">
+                    <div class="thumbnail active" onclick="changeImage('mainImg1', 'img/gallery_resort.png', this)">
+                        <img src="img/gallery_resort.png" alt="View 1">
+                    </div>
+                    <div class="thumbnail" onclick="changeImage('mainImg1', 'img/resort.png', this)">
+                        <img src="img/resort.png" alt="View 2">
+                    </div>
+                    <div class="thumbnail" onclick="changeImage('mainImg1', 'img/r1.jpeg', this)">
+                        <img src="img/r1.jpeg" alt="View 3">
+                    </div>
+                </div>
+            </div>
+            <div class="room-content">
+                <div class="room-header">
+                    <div>
+                        <h2>Misty Peak Luxury Resort</h2>
+                        <span style="color:var(--text-muted);">Premium Valley View Suite</span>
+                    </div>
+                    <div class="room-price-large">
+                        ₹6,500 <span class="room-price-sub">per night (taxes incl.)</span>
+                    </div>
+                </div>
+                
+                <div class="room-meta">
+            <div class="meta-item"><i class="ph ph-corners-out"></i> <span>650 sq.ft</span></div>
+            <div class="meta-item"><i class="ph ph-users"></i> <span>Up to 3 Guests</span></div>
+            <div class="meta-item"><i class="ph ph-bed"></i> <span>King Size Bed</span></div>
+            <div class="meta-item"><i class="ph ph-clock"></i> <span>Check-in: 2 PM | Check-out: 11 AM</span></div>
+        </div>
+
+        <p class="room-desc">
+            Perched on the highest ridge of Yercaud, our flagship premium suite offers an unobstructed 180-degree view of the valley below. Wake up to the clouds rolling in through your private glass balcony. The room features bespoke wooden interiors, a spacious living area, and a spa-inspired bathroom with a jacuzzi overlooking the forest.
+        </p>
+
+        <h4 class="amenities-title">Room Amenities & Features</h4>
+        <div class="amenities-grid">
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Private Glass Balcony</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Temperature Controlled</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Private Jacuzzi</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Breakfast & Dinner</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Infinity Pool Access</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> 24/7 Butler Service</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Evening Bonfire</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Free High-speed WiFi</div>
+        </div>
+
+        <div class="book-action">
+            <button class="btn btn-primary" style="padding: 12px 35px; font-size: 1.05rem;" onclick="openModal('room'); document.getElementById('roomType').value='Luxury Resort';">Reserve this Suite</button>
+        </div>
+            </div>
+        </div>
+
+        <!-- Room 2 -->
+        <div class="room-card-large" id="room2" style="display: none;">
+            <div class="room-gallery">
+                <div class="main-img-container">
+                    <img src="img/resort.png" alt="Silver Oak Homestay" id="mainImg2">
+                </div>
+                <div class="thumbnail-row">
+                    <div class="thumbnail active" onclick="changeImage('mainImg2', 'img/resort.png', this)">
+                        <img src="img/resort.png" alt="View 1">
+                    </div>
+                    <div class="thumbnail" onclick="changeImage('mainImg2', 'img/gallery_resort.png', this)">
+                        <img src="img/gallery_resort.png" alt="View 2">
+                    </div>
+                    <div class="thumbnail" onclick="changeImage('mainImg2', 'img/r1.jpeg', this)">
+                        <img src="img/r1.jpeg" alt="View 3">
+                    </div>
+                </div>
+            </div>
+            <div class="room-content">
+                <div class="room-header">
+                    <div>
+                        <h2>Silver Oak Heritage Homestay</h2>
+                        <span style="color:var(--text-muted);">Traditional Plantation Cottage</span>
+                    </div>
+                    <div class="room-price-large">
+                        ₹3,200 <span class="room-price-sub">per night (taxes incl.)</span>
+                    </div>
+                </div>
+                
+                <div class="room-meta">
+            <div class="meta-item"><i class="ph ph-corners-out"></i> <span>400 sq.ft</span></div>
+            <div class="meta-item"><i class="ph ph-users"></i> <span>Up to 4 Guests</span></div>
+            <div class="meta-item"><i class="ph ph-bed"></i> <span>2 Queen Beds</span></div>
+            <div class="meta-item"><i class="ph ph-clock"></i> <span>Flexible Check-in</span></div>
+        </div>
+
+        <p class="room-desc">
+            Experience authentic Yercaud hospitality nestled deep within a 50-acre working coffee and pepper plantation. This 100-year-old restored British-era cottage offers peace, tranquility, and the rich aroma of freshly roasted coffee. Perfect for families looking for a digital detox and nature connection.
+        </p>
+
+        <h4 class="amenities-title">Room Amenities & Features</h4>
+        <div class="amenities-grid">
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Authentic Home Meals</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Guided Estate Walk</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Private Garden Space</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Antique Teak Furniture</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Pet Friendly</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Campfire & BBQ setup</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Hot Water 24/7</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Filter Coffee</div>
+        </div>
+
+        <div class="book-action">
+            <button class="btn btn-primary" style="padding: 12px 35px; font-size: 1.05rem;" onclick="openModal('room'); document.getElementById('roomType').value='Cozy Homestay';">Reserve this Cottage</button>
+        </div>
+            </div>
+        </div>
+
+        <!-- Room 3 -->
+        <div class="room-card-large" id="room3" style="display: none;">
+            <div class="room-gallery">
+                <div class="main-img-container">
+                    <img src="img/r1.jpeg" alt="Yercaud Central Hotel" id="mainImg3">
+                </div>
+                <div class="thumbnail-row">
+                    <div class="thumbnail active" onclick="changeImage('mainImg3', 'img/r1.jpeg', this)">
+                        <img src="img/r1.jpeg" alt="View 1">
+                    </div>
+                    <div class="thumbnail" onclick="changeImage('mainImg3', 'img/resort.png', this)">
+                        <img src="img/resort.png" alt="View 2">
+                    </div>
+                    <div class="thumbnail" onclick="changeImage('mainImg3', 'img/gallery_resort.png', this)">
+                        <img src="img/gallery_resort.png" alt="View 3">
+                    </div>
+                </div>
+            </div>
+            <div class="room-content">
+                <div class="room-header">
+                    <div>
+                        <h2>Yercaud Central Hotel</h2>
+                        <span style="color:var(--text-muted);">Executive Double Room</span>
+                    </div>
+                    <div class="room-price-large">
+                        ₹1,800 <span class="room-price-sub">per night (taxes incl.)</span>
+                    </div>
+                </div>
+                
+                <div class="room-meta">
+            <div class="meta-item"><i class="ph ph-corners-out"></i> <span>250 sq.ft</span></div>
+            <div class="meta-item"><i class="ph ph-users"></i> <span>Up to 2 Guests</span></div>
+            <div class="meta-item"><i class="ph ph-bed"></i> <span>1 Double Bed</span></div>
+            <div class="meta-item"><i class="ph ph-clock"></i> <span>Check-in: 12 PM | Check-out: 11 AM</span></div>
+        </div>
+
+        <p class="room-desc">
+            Convenience meets comfort right in the heart of the town. Located just a 5-minute walk from the famous Yercaud Lake and Anna Park, this newly renovated modern hotel is perfect for travelers who want quick access to tourist spots, local markets, and cafes.
+        </p>
+
+        <h4 class="amenities-title">Room Amenities & Features</h4>
+        <div class="amenities-grid">
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Prime Town Center</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Secure Parking</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> 43" Smart TV</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Air Conditioning</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> In-house Restaurant</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Work Desk & Chair</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Daily Housekeeping</div>
+            <div class="amenity-item"><i class="ph ph-check-circle"></i> Travel Desk</div>
+        </div>
+
+        <div class="book-action">
+            <button class="btn btn-primary" style="padding: 12px 35px; font-size: 1.05rem;" onclick="openModal('room'); document.getElementById('roomType').value='Budget Hotel';">Reserve this Room</button>
+        </div>
+            </div>
+        </div>
+
+        </section>
+    </div>
+
+    <!-- Booking Modal (Reused from index.html) -->
+    <div class="modal-overlay" id="bookingModal">
+        <div class="glass-panel modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2 id="modalTitle" style="margin-bottom: 20px;">Book a Service</h2>
+            
+            <form id="bookingForm" onsubmit="submitBooking(event)">
+                <input type="hidden" id="bookingType" name="type" value="">
+                
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" id="name" required placeholder="John Doe">
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" class="form-control" id="email" required placeholder="john@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" class="form-control" id="phone" required placeholder="+91 82206 79754">
+                </div>
+
+                <!-- Dynamic Fields Container -->
+                <div id="dynamicFields"></div>
+
+                <div class="form-group">
+                    <label>Description / Comments</label>
+                    <textarea class="form-control" id="notes" placeholder="Any special requests or comments?"></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary submit-btn" id="submitBtn">Send Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"></div>
+
+    <!-- Floating Call Button -->
+    <a href="tel:+918220679754" class="floating-call-btn" title="Call Us Now">
+        <i class="ph ph-phone-call"></i>
+    </a>
+
+    <script src="app.js"></script>
+    <script>
+        function changeImage(mainImgId, newSrc, thumbnailElement) {
+            const mainImg = document.getElementById(mainImgId);
+            mainImg.style.opacity = '0.5';
+            
+            setTimeout(() => {
+                mainImg.src = newSrc;
+                mainImg.style.opacity = '1';
+            }, 150);
+
+            // Update active state on thumbnails
+            const thumbnails = thumbnailElement.parentElement.children;
+            for(let i = 0; i < thumbnails.length; i++) {
+                thumbnails[i].classList.remove('active');
+            }
+            thumbnailElement.classList.add('active');
+        }
+
+        function viewRoom(roomId) {
+            document.getElementById('roomGridView').style.display = 'none';
+            document.getElementById('roomDetailsView').style.display = 'block';
+            
+            // Hide all large cards
+            document.getElementById('room1').style.display = 'none';
+            document.getElementById('room2').style.display = 'none';
+            document.getElementById('room3').style.display = 'none';
+            
+            // Show selected card
+            document.getElementById(roomId).style.display = ''; // Fallback to stylesheet's display: flex
+            window.scrollTo(0, 0);
+        }
+
+        function backToRooms() {
+            document.getElementById('roomDetailsView').style.display = 'none';
+            document.getElementById('roomGridView').style.display = 'grid';
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>

@@ -39,7 +39,7 @@
     `;
     document.body.insertAdjacentHTML('afterbegin', preloaderHtml);
 
-    window.addEventListener('load', () => {
+    const hidePreloader = () => {
         const loader = document.getElementById('p360_preloader');
         if (loader) {
             setTimeout(() => {
@@ -47,7 +47,31 @@
                 setTimeout(() => loader.remove(), 750);
             }, 500);
         }
-    });
+    };
+
+    if (document.readyState === 'complete') {
+        hidePreloader();
+    } else {
+        window.addEventListener('load', hidePreloader);
+    }
+})();
+
+// Safe localStorage wrapper for iframe/sandboxed environments
+const safeStorage = (function() {
+    try {
+        const testKey = '__storage_test__';
+        window.localStorage.setItem(testKey, testKey);
+        window.localStorage.removeItem(testKey);
+        return window.localStorage;
+    } catch (e) {
+        const memoryStorage = {};
+        return {
+            getItem(key) { return memoryStorage[key] || null; },
+            setItem(key, value) { memoryStorage[key] = String(value); },
+            removeItem(key) { delete memoryStorage[key]; },
+            clear() { for (const k in memoryStorage) delete memoryStorage[k]; }
+        };
+    }
 })();
 
 // ─── API Configuration ──────────────────────────────────
@@ -72,17 +96,17 @@ const Auth = {
         return 'yercaud_customer';
     },
 
-    getToken(role) { return localStorage.getItem(`${this.getContext(role)}_token`); },
+    getToken(role) { return safeStorage.getItem(`${this.getContext(role)}_token`); },
     getUser(role) {
         try {
             const ctx = this.getContext(role);
-            let user = JSON.parse(localStorage.getItem(`${ctx}_user`));
+            let user = JSON.parse(safeStorage.getItem(`${ctx}_user`));
             
             // Fallback: Search all possible role contexts if not found in primary
             if (!user) {
                 const roles = ['admin', 'vendor', 'driver', 'delivery', 'customer'];
                 for (const r of roles) {
-                    const u = JSON.parse(localStorage.getItem(`yercaud_${r}_user`));
+                    const u = JSON.parse(safeStorage.getItem(`yercaud_${r}_user`));
                     if (u) {
                         // If we were looking for a specific role, only return if it matches OR if user is admin
                         if (role) {
@@ -100,14 +124,14 @@ const Auth = {
 
     save(token, user) {
         const ctx = this.getContext(user.role);
-        localStorage.setItem(`${ctx}_token`, token);
-        localStorage.setItem(`${ctx}_user`, JSON.stringify(user));
+        safeStorage.setItem(`${ctx}_token`, token);
+        safeStorage.setItem(`${ctx}_user`, JSON.stringify(user));
     },
 
     logout(role) {
         const ctx = this.getContext(role);
-        localStorage.removeItem(`${ctx}_token`);
-        localStorage.removeItem(`${ctx}_user`);
+        safeStorage.removeItem(`${ctx}_token`);
+        safeStorage.removeItem(`${ctx}_user`);
 
         const path = window.location.pathname;
         if (path.includes('admin') || role === 'admin') window.location.href = 'admin-login';
@@ -177,11 +201,11 @@ const Auth = {
 // Client-side local mock database and routing to run 100% offline
 const mockDB = {
     get(key, defaultVal = []) {
-        const val = localStorage.getItem('y360_mock_' + key);
+        const val = safeStorage.getItem('y360_mock_' + key);
         return val ? JSON.parse(val) : defaultVal;
     },
     set(key, val) {
-        localStorage.setItem('y360_mock_' + key, JSON.stringify(val));
+        safeStorage.setItem('y360_mock_' + key, JSON.stringify(val));
     }
 };
 
@@ -1206,7 +1230,7 @@ const Cart = {
 
     init() {
         try {
-            const saved = JSON.parse(localStorage.getItem('yercaud_cart') || '{}');
+            const saved = JSON.parse(safeStorage.getItem('yercaud_cart') || '{}');
             this.items = saved.items || [];
             this.vendorId = saved.vendorId || null;
             this.type = saved.type || 'food';
@@ -1215,7 +1239,7 @@ const Cart = {
     },
 
     save() {
-        localStorage.setItem('yercaud_cart', JSON.stringify({
+        safeStorage.setItem('yercaud_cart', JSON.stringify({
             items: this.items,
             vendorId: this.vendorId,
             type: this.type
@@ -1547,9 +1571,10 @@ const UI = {
         } else {
             // Pure Customer Navbar (Serverless Frontend-Only)
             links = `
-                <a href="rooms.html"><i class="ph ph-house"></i> Stays</a>
+                <a href="rooms.html"><i class="ph ph-buildings"></i> Stays</a>
                 <a href="taxi.html"><i class="ph ph-car"></i> Taxis</a>
                 <a href="food.html"><i class="ph ph-hamburger"></i> Food</a>
+                <a href="services.html"><i class="ph ph-sparkles"></i> Celebrations</a>
                 <a href="trip-planner.html" class="text-accent" style="font-weight:600"><i class="ph ph-sparkle"></i> Trip Planner</a>
             `;
             if (showCart) {

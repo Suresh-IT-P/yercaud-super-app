@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safe & Reliable Taxi Booking in Yercaud | Book&Sync</title>
+    <meta name="description" content="Book affordable cabs and local sightseeing hill tours in Yercaud. Real-time pilot tracking, fixed pricing, and professional drivers only on Book&Sync.">
+    <meta name="keywords" content="Yercaud taxi, cab booking Yercaud, Yercaud hill tour, sightseeing Yercaud, Book&Sync taxi">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Razorpay script removed -->
+    
+    <!-- Leaflet Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .stepper { display: flex; justify-content: space-between; position: relative; margin-bottom: 2rem; }
+        .stepper::before { content: ''; position: absolute; top: 18px; left: 0; right: 0; height: 2px; background: #E2E8F0; z-index: 1; }
+        .step { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
+        .step-icon { width: 36px; height: 36px; background: white; border: 2px solid #E2E8F0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #94A3B8; transition: all 0.3s ease; }
+        .step.active .step-icon { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 0 0 4px rgba(26,74,46,0.1); }
+        .step-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #94A3B8; letter-spacing: 0.5px; text-align: center; }
+        .step.active .step-label { color: var(--primary); }
+        
+        .spinner-lg { width: 60px; height: 60px; border: 4px solid #F1F5F9; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .pulse { animation: pulse-animation 2s infinite; }
+        @keyframes pulse-animation { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* Custom Responsive Fixes */
+        .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        
+        @media (max-width: 768px) {
+            #mainContainer { margin-top: 0.5rem !important; padding: 1.2rem !important; border-radius: var(--radius-lg) !important; }
+            .container { padding: 0 1rem !important; }
+            .page-header { padding: 6rem 1rem 2rem !important; }
+            .step-icon { width: 32px; height: 32px; }
+            .step-label { font-size: 0.55rem; }
+        }
+
+        @media (max-width: 480px) {
+            .category-grid { grid-template-columns: repeat(2, 1fr); }
+            #mainContainer { padding: 1rem !important; border-radius: 12px !important; }
+            .stepper { margin-bottom: 1.5rem; gap: 5px; }
+            .step-icon { width: 26px; height: 26px; font-size: 0.75rem; }
+            .step-label { font-size: 0.45rem; letter-spacing: 0; line-height: 1.1; }
+            .step-icon i { font-size: 0.9rem; }
+            
+            /* Allow header badges to wrap on small screens */
+            .flex.justify-between.items-center { flex-wrap: wrap; gap: 8px; }
+        }
+
+        @keyframes modalIn { to { transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <nav id="navbar" class="scrolled"></nav>
+    <div class="page-header"></div>
+
+    <div class="container" style="padding-bottom: 2rem;">
+        <!-- Booking Form & Dashboard Container -->
+        <div class="card mb-4" id="mainContainer" style="margin: 1rem auto 2rem; max-width: 700px;">
+            <div id="taxiFormBox">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 style="font-family:Outfit;"><i class="ph ph-map-pin"></i> Request a Pilot</h3>
+                    <span class="badge badge-accent">DISTANCE-BASED FARE</span>
+                </div>
+                <form id="taxiForm">
+                    <div class="form-group">
+                        <label>Pickup Location</label>
+                        <div style="background: #F8FAFC; padding: 1rem; border-radius: 12px; border: 1.5px solid #E2E8F0; display: flex; align-items: center; gap: 10px;">
+                            <i class="ph ph-gps text-primary" style="font-size: 1.2rem;"></i>
+                            <div style="flex: 1;">
+                                <span id="pickupDisplay" style="font-weight: 700; font-size: 0.95rem; color: var(--dark-800);">Detecting live location...</span>
+                                <p id="geoStatus" style="font-size: 0.75rem; color: #64748B; margin: 0;">GPS Connectivity</p>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="getLiveLocation()" style="padding: 8px 14px; font-size: 0.75rem; border-radius: 10px; box-shadow: var(--shadow-sm);">
+                                <i class="ph ph-arrows-clockwise"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Booking Stepper -->
+                    <div class="stepper mb-8 mt-2">
+                        <div class="step active" id="sStep1">
+                            <div class="step-icon"><i class="ph ph-user"></i></div>
+                            <span class="step-label">Details</span>
+                        </div>
+                        <div class="step" id="sStep2">
+                            <div class="step-icon"><i class="ph ph-map-pin"></i></div>
+                            <span class="step-label">Route</span>
+                        </div>
+                        <div class="step" id="sStep3">
+                            <div class="step-icon"><i class="ph ph-car"></i></div>
+                            <span class="step-label">Vehicle</span>
+                        </div>
+                    </div>
+
+                    <!-- STEP 1: CUSTOMER DETAILS -->
+                    <div id="step-1" class="step-content">
+                        <h3 style="font-family:Outfit; margin-bottom: 1.5rem; font-weight: 800;">Customer Information</h3>
+                        <div class="form-group">
+                            <label>Traveler Name</label>
+                            <input type="text" id="custName" placeholder="Enter full name" style="padding:1rem; border-radius:14px; border:1.5px solid #E2E8F0; width:100%">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number (for Pilot contact)</label>
+                            <input type="tel" id="custPhone" placeholder="Enter 10-digit mobile" style="padding:1rem; border-radius:14px; border:1.5px solid #E2E8F0; width:100%">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address (for receipt/confirmation)</label>
+                            <input type="email" id="custEmail" placeholder="Enter email address" style="padding:1rem; border-radius:14px; border:1.5px solid #E2E8F0; width:100%">
+                        </div>
+                        <div class="form-group">
+                            <label>Number of Passengers</label>
+                            <select id="passengers" style="padding:1rem; border-radius:14px; border:1.5px solid #E2E8F0; width:100%">
+                                <option value="1-4">1 - 4 Passengers (Sedan/SUV)</option>
+                                <option value="5-7">5 - 7 Passengers (SUV/Premium)</option>
+                                <option value="8+">8+ Passengers (Group)</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-end mt-6">
+                            <button type="button" class="btn btn-primary" onclick="nextStep(2)" style="padding: 12px 30px; border-radius: 14px;">Next: Route <i class="ph ph-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: ROUTE & SERVICE CATEGORY -->
+                    <div id="step-2" class="step-content hidden">
+                        <h3 style="font-family:Outfit; margin-bottom: 1.5rem; font-weight: 800;">Route & Service</h3>
+                        
+                        <div class="form-group">
+                            <label>Pickup Point</label>
+                            <div style="background: #F8FAFC; padding: 1rem; border-radius: 14px; border: 1.5px solid #E2E8F0; display: flex; align-items: center; gap: 12px;">
+                                <i class="ph ph-gps text-primary" style="font-size: 1.4rem;"></i>
+                                <div style="flex: 1;">
+                                    <span id="pickupDisplay2" style="font-weight: 700; font-size: 0.95rem; color: var(--dark-800);">Detecting live location...</span>
+                                    <p id="geoStatus2" style="font-size: 0.75rem; color: #64748B; margin: 0;">GPS Connectivity</p>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="getLiveLocation()" style="padding: 8px 14px; font-size: 0.75rem; border-radius: 10px; box-shadow: var(--shadow-sm);">
+                                    <i class="ph ph-arrows-clockwise"></i> Refresh GPS
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Service Category</label>
+                            <div class="category-grid mb-4" id="serviceCategorySelector">
+                                <div class="card p-2 text-center pointer active" onclick="setServiceCategory('local')" id="catLocal" style="border: 2px solid var(--primary); background: #F0F9F4;">
+                                    <i class="ph ph-map-trifold" style="font-size: 1.5rem; color: var(--primary);"></i>
+                                    <div style="font-size: 0.75rem; font-weight: 700; margin-top: 5px;">SIGHTSEEING</div>
+                                </div>
+                                <div class="card p-2 text-center pointer" onclick="setServiceCategory('drop')" id="catDrop" style="border: 2px solid #E2E8F0;">
+                                    <i class="ph ph-map-pin" style="font-size: 1.5rem; color: var(--dark-500);"></i>
+                                    <div style="font-size: 0.75rem; font-weight: 700; margin-top: 5px;">LOCAL DROP</div>
+                                </div>
+                                <div class="card p-2 text-center pointer" onclick="setServiceCategory('outstation')" id="catOutstation" style="border: 2px solid #E2E8F0;">
+                                    <i class="ph ph-path" style="font-size: 1.5rem; color: var(--dark-500);"></i>
+                                    <div style="font-size: 0.75rem; font-weight: 700; margin-top: 5px;">OUTSTATION</div>
+                                </div>
+                                <div class="card p-2 text-center pointer" onclick="setServiceCategory('gateway')" id="catGateway" style="border: 2px solid #E2E8F0;">
+                                    <i class="ph ph-train" style="font-size: 1.5rem; color: var(--dark-500);"></i>
+                                    <div style="font-size: 0.75rem; font-weight: 700; margin-top: 5px;">SALEM JNC</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="serviceCategory" value="local">
+                        </div>
+
+                        <div id="packageBox" class="form-group">
+                            <label>Sightseeing Package</label>
+                            <select id="localPackage" class="form-control" onchange="updateEstimation()" style="width: 100%; padding: 0.85rem; border-radius: 14px; border: 1.5px solid #E2E8F0;">
+                                <option value="4">4 Hrs / 40 Km (Half Day)</option>
+                                <option value="8">8 Hrs / 80 Km (Full Day)</option>
+                            </select>
+                        </div>
+
+                        <div id="destinationBox" class="form-group hidden">
+                            <label id="destLabel">Drop Destination</label>
+                            <p class="text-muted mb-2" style="font-size:0.75rem"><i class="ph ph-cursor-click"></i> Search or Pin your destination on the map below:</p>
+                            <div id="destMap" style="height: 250px; border-radius: 16px; margin-bottom: 12px; background: #eee; border: 2.5px solid var(--dark-100);"></div>
+                            <div style="position: relative;">
+                                <input type="text" id="dropoff" placeholder="Search or Pin on Map" onkeydown="if(event.key==='Enter'){event.preventDefault();searchDestination();}" style="padding:1rem 3rem 1rem 1rem; border:1.5px solid #E2E8F0; border-radius:14px; width:100%; font-weight: 700;">
+                                <button type="button" onclick="searchDestination()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                    <i class="ph ph-magnifying-glass" style="font-size: 1.5rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="gatewayNote" class="hidden" style="background: #F0F9FF; border: 1px solid #BAE6FD; padding: 12px; border-radius: 14px; margin-bottom: 1.5rem; color: #0369A1; font-size: 0.8rem;">
+                            <i class="ph ph-info"></i> <b>Flat Rate:</b> Direct transfer between Salem Junction & Yercaud hotels.
+                        </div>
+
+                        <div class="flex justify-between mt-6">
+                            <button type="button" class="btn btn-outline" onclick="nextStep(1)" style="border: none; background: #f1f5f9;">Back</button>
+                            <button type="button" class="btn btn-primary" onclick="nextStep(3)" style="padding: 12px 30px; border-radius: 14px;">Next: Vehicle <i class="ph ph-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: VEHICLE SELECTION & FINAL CONFIRM -->
+                    <div id="step-3" class="step-content hidden">
+                        <h3 style="font-family:Outfit; margin-bottom: 1.5rem; font-weight: 800;">Choose Vehicle & Book</h3>
+                        
+                        <div class="form-group">
+                            <label>Available Vehicle Tiers</label>
+                            <div class="grid grid-1 gap-3" id="vehicleOptionsContainer">
+                                <!-- Vehicle cards will be rendered here with live estimates -->
+                                <div class="card p-4 flex justify-between items-center pointer" onclick="setVehicleType('sedan')" id="vTypeSedan" style="border: 2px solid var(--primary); background: #F0F9F4; border-radius: 18px;">
+                                    <div class="flex items-center gap-4">
+                                        <div style="background: white; width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm);">
+                                            <i class="ph ph-car-profile" style="font-size: 2rem; color: var(--primary);"></i>
+                                        </div>
+                                        <div>
+                                            <h4 style="margin:0; font-weight: 800;">SEDAN</h4>
+                                            <p class="text-muted" style="font-size: 0.75rem; margin: 0;">Dzire, Etios • 4 Seats</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div id="fareSedan" style="font-size: 1.3rem; font-weight: 800; color: var(--dark);">₹---</div>
+                                        <span class="badge badge-green" style="font-size: 0.6rem;">AVAILABLE</span>
+                                    </div>
+                                </div>
+
+                                <div class="card p-4 flex justify-between items-center pointer" onclick="setVehicleType('suv')" id="vTypeSuv" style="border: 2px solid #E2E8F0; border-radius: 18px;">
+                                    <div class="flex items-center gap-4">
+                                        <div style="background: white; width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="ph ph-jeep" style="font-size: 2rem; color: var(--dark-500);"></i>
+                                        </div>
+                                        <div>
+                                            <h4 style="margin:0; font-weight: 800;">SUV</h4>
+                                            <p class="text-muted" style="font-size: 0.75rem; margin: 0;">Ertiga, Xylo • 6 Seats</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div id="fareSuv" style="font-size: 1.3rem; font-weight: 800; color: var(--dark);">₹---</div>
+                                    </div>
+                                </div>
+
+                                <div class="card p-4 flex justify-between items-center pointer" onclick="setVehicleType('premium')" id="vTypePremium" style="border: 2px solid #E2E8F0; border-radius: 18px;">
+                                    <div class="flex items-center gap-4">
+                                        <div style="background: white; width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="ph ph-shield-star" style="font-size: 2rem; color: var(--dark-500);"></i>
+                                        </div>
+                                        <div>
+                                            <h4 style="margin:0; font-weight: 800;">PREMIUM</h4>
+                                            <p class="text-muted" style="font-size: 0.75rem; margin: 0;">Innova Crysta • 7 Seats</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div id="farePremium" style="font-size: 1.3rem; font-weight: 800; color: var(--dark);">₹---</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="vehicleType" value="sedan">
+                        </div>
+
+                        <div id="fareSummary" class="mb-5" style="border-radius: 20px; border: 1.5px solid #E2E8F0; overflow: hidden; background: white; box-shadow: var(--shadow-sm);">
+                             <!-- Dynamic Fare Details -->
+                        </div>
+
+                        <div class="flex justify-between gap-3">
+                            <button type="button" class="btn btn-outline" onclick="nextStep(2)" style="border: none; background: #f1f5f9; flex: 1;">Back</button>
+                            <button type="submit" class="btn btn-primary" id="taxiSubmitBtn" style="padding: 12px 30px; border-radius: 14px; flex: 2; font-weight: 800;">
+                                <i class="ph ph-sparkle"></i> Book Ride Now
+                            </button>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="pLat">
+                    <input type="hidden" id="pLng">
+                    <input type="hidden" id="dLat">
+                    <input type="hidden" id="dLng">
+                </form>
+            </div>
+
+            <!-- Ride Tracking Dashboard (Dynamic Content) -->
+            <div id="rideDashboard" class="hidden"></div>
+        </div>
+
+        <!-- Available Drivers & Pilot CTA sections removed -->
+    </div>
+
+    <!-- Booking Confirmation Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content" style="max-width:450px">
+            <button class="close-btn" onclick="document.getElementById('confirmModal').classList.remove('active')"><i class="ph ph-x"></i></button>
+            <h2 style="font-family:Outfit;margin-bottom:1rem;color:var(--primary)"><i class="ph ph-shield-check"></i> Confirm Booking</h2>
+            
+            <div style="background:#F8FAFC; padding:1rem; border-radius:12px; margin-bottom:1rem">
+                <div class="flex gap-2 items-start mb-3">
+                    <i class="ph ph-map-pin text-primary" style="margin-top:2px"></i>
+                    <div>
+                        <span style="font-size:0.75rem; color:#64748B; text-transform:uppercase">Pickup</span>
+                        <p id="confPickup" style="font-weight:600; font-size:0.95rem"></p>
+                    </div>
+                </div>
+                <div class="flex gap-2 items-start">
+                    <i class="ph ph-navigation-arrow text-accent" style="margin-top:2px"></i>
+                    <div>
+                        <span style="font-size:0.75rem; color:#64748B; text-transform:uppercase">Destination</span>
+                        <p id="confDropoff" style="font-weight:600; font-size:0.95rem"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #FFFBEB; border: 1px solid #FEF3C7; padding: 10px; border-radius: 12px; margin-bottom: 1rem; color: #92400E; font-size: 0.8rem; display: flex; align-items: center; gap: 8px;">
+                <i class="ph ph-warning-circle" style="font-size: 1.2rem; flex-shrink: 0;"></i>
+                <span><b>Policy:</b> This booking is final. Changes or cancellations are not allowed once confirmed.</span>
+            </div>
+
+            <div class="flex justify-between items-center mb-1 p-3" style="background:var(--primary); color:white; border-radius:12px 12px 0 0">
+                <span style="font-weight:600">Total Fare</span>
+                <span style="font-size:1.4rem; font-family:Outfit; font-weight:700" id="confFare">₹0</span>
+            </div>
+            <div id="fareBreakdown" style="background:#f1f5f9; padding:10px; border-radius:0 0 12px 12px; margin-bottom:1rem; font-size:0.85rem">
+                <!-- Dynamic Breakdown -->
+            </div>
+
+            <button id="finalBookBtn" class="btn btn-primary btn-full" style="padding:1rem; font-size:1.1rem">
+                <i class="ph ph-lightning"></i> Book Now
+            </button>
+            <p class="text-center mt-2 text-muted" style="font-size:0.8rem">Broadcasting to all nearby pilots</p>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Resilient Swal fallback for offline usage
+        if (typeof Swal === 'undefined') {
+            window.Swal = {
+                fire: function(options) {
+                    if (options.input === 'textarea') {
+                        const val = prompt((options.title || '') + '\n' + (options.text || ''));
+                        if (val !== null && options.preConfirm) {
+                            return options.preConfirm(val).then(res => {
+                                return { isConfirmed: true, value: val };
+                            });
+                        }
+                    }
+                    const confirmed = confirm((options.title || '') + '\n' + (options.text || '') + (options.html ? '\n' + options.html.replace(/<[^>]*>/g, '') : ''));
+                    return Promise.resolve({ isConfirmed: confirmed, value: confirmed });
+                }
+            };
+        }
+
+        UI.renderHeader('<i class="ph ph-car-profile"></i> Hill Station Cabs', 'Pay only for the distance you travel', 'linear-gradient(135deg,#1a3d17,#E8A83A)');
+
+        let destMap, destMarker;
+        const YERCAUD_CENTER = [11.7800, 78.2100];
+
+        // Helper: Haversine on Client
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        async function searchDestination() {
+            const query = document.getElementById('dropoff').value;
+            const cat = document.getElementById('serviceCategory').value;
+            if (!query) return;
+            
+            // For outstation, search all over Tamil Nadu/India. For local, keep it focused.
+            const searchSuffix = (cat === 'local' || cat === 'drop' || cat === 'gateway') ? ', Yercaud' : ', Tamil Nadu';
+            
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + searchSuffix)}`);
+                const data = await res.json();
+                if (data.length > 0) {
+                    const { lat, lon, display_name } = data[0];
+                    destMap.setView([lat, lon], cat === 'outstation' ? 12 : 16);
+                    setDestination(parseFloat(lat), parseFloat(lon));
+                    
+                    // Show a cleaner name in the input
+                    const parts = display_name.split(',');
+                    document.getElementById('dropoff').value = parts.slice(0, 3).join(', ');
+                } else {
+                    Toast.show("Location not found. Try adding city name.", "error");
+                }
+            } catch(e) {
+                Toast.show("Search failed", "error");
+            }
+        }
+
+        function quickSelect(name, lat, lng) {
+            document.getElementById('dropoff').value = name;
+            document.getElementById('dLat').value = lat;
+            document.getElementById('dLng').value = lng;
+            
+            if (destMap) {
+                destMap.setView([lat, lng], 15);
+                setDestination(lat, lng);
+            }
+        }
+
+        async function initDestMap() {
+            if (typeof L === 'undefined') {
+                console.warn('Leaflet is not loaded (running offline). Map initialization skipped.');
+                const destMapContainer = document.getElementById('destMap');
+                if (destMapContainer) {
+                    destMapContainer.innerHTML = `
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; padding:2rem; background:#F8FAFC; color:#64748B; text-align:center; border: 1.5px dashed #E2E8F0; border-radius:16px;">
+                            <i class="ph ph-map-trifold" style="font-size:3rem; margin-bottom:1rem; opacity:0.5;"></i>
+                            <h4 style="margin-bottom:0.5rem; color:var(--dark-800);">Map Offline</h4>
+                            <p style="font-size:0.85rem;">Interactive map could not load. You can still type your pickup and dropoff locations manually.</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            destMap = L.map('destMap').setView(YERCAUD_CENTER, 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(destMap);
+
+            destMap.on('click', (e) => {
+                setDestination(e.latlng.lat, e.latlng.lng);
+            });
+        }
+
+        async function setDestination(lat, lng) {
+            if (typeof L === 'undefined' || !destMap) {
+                document.getElementById('dLat').value = lat;
+                document.getElementById('dLng').value = lng;
+                updateEstimation();
+                return;
+            }
+            if (destMarker) destMarker.setLatLng([lat, lng]);
+            else destMarker = L.marker([lat, lng], { draggable: true }).addTo(destMap);
+
+            document.getElementById('dLat').value = lat;
+            document.getElementById('dLng').value = lng;
+
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                const data = await res.json();
+                const name = data.display_name.split(',').slice(0, 2).join(', ');
+                document.getElementById('dropoff').value = name || "Selected on Map";
+            } catch(e) {
+                document.getElementById('dropoff').value = "Pinned Location";
+            }
+
+            updateEstimation();
+            
+            destMarker.on('dragend', (e) => {
+                const pos = e.target.getLatLng();
+                setDestination(pos.lat, pos.lng);
+            });
+        }
+
+        let currentStep = 1;
+        function nextStep(step) {
+            // Validation
+            if (step === 2 && currentStep === 1) {
+                if (!document.getElementById('custName').value || !document.getElementById('custPhone').value) {
+                    Toast.show("Please enter name and phone", "info"); return;
+                }
+            }
+            if (step === 3 && currentStep === 2) {
+                const cat = document.getElementById('serviceCategory').value;
+                if (!document.getElementById('pLat').value) { Toast.show("Waiting for pickup location...", "info"); return; }
+                if (cat !== 'local' && !document.getElementById('dLat').value) { 
+                    const msg = cat === 'gateway' ? "Please pick your hotel on map" : "Please pick destination on map";
+                    Toast.show(msg, "error"); return; 
+                }
+            }
+
+            // UI Update
+            document.querySelectorAll('.step-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById('step-' + step).classList.remove('hidden');
+            
+            // Stepper Update
+            for (let i = 1; i <= 3; i++) {
+                const el = document.getElementById('sStep' + i);
+                if (el) {
+                    if (i <= step) el.classList.add('active');
+                    else el.classList.remove('active');
+                }
+            }
+
+            currentStep = step;
+            if (step === 2 && destMap) setTimeout(() => destMap.invalidateSize(), 300);
+            updateEstimation();
+        }
+
+        function setServiceCategory(cat) {
+            document.getElementById('serviceCategory').value = cat;
+            const categories = ['local', 'drop', 'outstation', 'gateway'];
+            categories.forEach(c => {
+                const el = document.getElementById('cat' + c.charAt(0).toUpperCase() + c.slice(1));
+                if (el) {
+                    if (c === cat) {
+                        el.style.borderColor = 'var(--primary)';
+                        el.style.background = '#F0F9F4';
+                    } else {
+                        el.style.borderColor = '#E2E8F0';
+                        el.style.background = 'white';
+                    }
+                }
+            });
+
+            document.getElementById('packageBox').classList.toggle('hidden', cat !== 'local');
+            document.getElementById('destinationBox').classList.toggle('hidden', cat === 'local');
+            document.getElementById('gatewayNote').classList.toggle('hidden', cat !== 'gateway');
+            
+            const destLabel = document.getElementById('destLabel');
+            if (cat === 'gateway') destLabel.innerText = "Target Hotel in Yercaud";
+            else if (cat === 'outstation') destLabel.innerText = "Drop-off City/Address";
+            else if (cat === 'drop') destLabel.innerText = "Local Destination";
+
+            if (cat !== 'local' && destMap) {
+                setTimeout(() => {
+                    destMap.invalidateSize();
+                    if (cat === 'outstation') destMap.setView(YERCAUD_CENTER, 8);
+                    else if (cat === 'gateway' || cat === 'drop') destMap.setView(YERCAUD_CENTER, 15);
+                }, 200);
+            }
+            updateEstimation();
+        }
+
+        function setVehicleType(type) {
+            document.getElementById('vehicleType').value = type;
+            const types = ['sedan', 'suv', 'premium'];
+            types.forEach(t => {
+                const el = document.getElementById('vType' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (t === type) {
+                    el.style.borderColor = 'var(--primary)';
+                    el.style.background = '#F0F9F4';
+                } else {
+                    el.style.borderColor = '#E2E8F0';
+                    el.style.background = 'white';
+                }
+            });
+            updateEstimation();
+        }
+
+        const TARIFF = {
+            local: {
+                sedan: { 4: 1500, 8: 2800, extraKm: 15, extraHr: 200 },
+                suv: { 4: 2200, 8: 3500, extraKm: 20, extraHr: 250 },
+                premium: { 4: 2800, 8: 4500, extraKm: 25, extraHr: 300 }
+            },
+            drop: {
+                sedan: { rate: 14, min: 200 },
+                suv: { rate: 35, min: 350 },
+                premium: { rate: 50, min: 500 }
+            },
+            outstation: {
+                sedan: { rate: 15, min: 250 },
+                suv: { rate: 20, min: 250 },
+                premium: { rate: 25, min: 300 }
+            },
+            gateway: {
+                sedan: 1800,
+                suv: 2500,
+                premium: 3200
+            }
+        };
+
+        function calculateFare(cat, vType) {
+            let baseFare = 0;
+            let bata = (cat === 'outstation' || cat === 'local') ? 300 : 0;
+            if (cat === 'outstation') bata = 500;
+            let hillSurcharge = (cat === 'gateway') ? 0 : 300;
+            
+            if (cat === 'local') {
+                const pkg = document.getElementById('localPackage').value;
+                baseFare = TARIFF.local[vType][pkg];
+                const kms = pkg == '4' ? 40 : 80;
+                return { total: baseFare + bata + hillSurcharge, base: baseFare, bata, hill: hillSurcharge, kms };
+            } else if (cat === 'drop') {
+                const pLat = parseFloat(document.getElementById('pLat').value);
+                const dLat = parseFloat(document.getElementById('dLat').value);
+                if (!pLat || !dLat) return { total: 0 };
+                const dist = calculateDistance(pLat, parseFloat(document.getElementById('pLng').value), dLat, parseFloat(document.getElementById('dLng').value));
+                baseFare = Math.max(Math.round(dist * TARIFF.drop[vType].rate), TARIFF.drop[vType].min);
+                return { total: baseFare + hillSurcharge, base: baseFare, bata: 0, hill: hillSurcharge, kms: dist };
+            } else if (cat === 'outstation') {
+                const pLat = parseFloat(document.getElementById('pLat').value);
+                const dLat = parseFloat(document.getElementById('dLat').value);
+                if (!pLat || !dLat) return { total: 0 };
+                const dist = calculateDistance(pLat, parseFloat(document.getElementById('pLng').value), dLat, parseFloat(document.getElementById('dLng').value)) * 2;
+                const billedKm = Math.max(dist, TARIFF.outstation[vType].min);
+                baseFare = Math.round(billedKm * TARIFF.outstation[vType].rate);
+                return { total: baseFare + bata + hillSurcharge, base: baseFare, bata, hill: hillSurcharge, kms: billedKm };
+            } else {
+                baseFare = TARIFF.gateway[vType];
+                return { total: baseFare, base: baseFare, bata: 0, hill: 0, kms: 35 }; // Approx for Salem-Yercaud
+            }
+        }
+
+        function calculateFareWithFee(cat, vType) {
+            const fare = calculateFare(cat, vType);
+            if (fare.total === 0) return fare;
+            
+            const platformFee = Math.round(fare.total * 0.05);
+            return {
+                ...fare,
+                platformFee: platformFee,
+                total: fare.total + platformFee
+            };
+        }
+
+        function updateEstimation() {
+            const cat = document.getElementById('serviceCategory').value;
+            const currentVType = document.getElementById('vehicleType').value;
+
+            // Update all vehicle tier fares in Step 3
+            ['sedan', 'suv', 'premium'].forEach(t => {
+                const fareObj = calculateFareWithFee(cat, t);
+                const el = document.getElementById('fare' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (el) el.innerText = fareObj.total > 0 ? `₹${fareObj.total}` : '---';
+            });
+
+            // Update Final Summary
+            const final = calculateFareWithFee(cat, currentVType);
+            const summaryEl = document.getElementById('fareSummary');
+            if (final.total > 0) {
+                summaryEl.innerHTML = `
+                    <div style="background: var(--primary); color: white; padding: 12px 20px; font-weight: 700; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="ph ph-receipt"></i> FARE BREAKDOWN</span>
+                        <span style="font-weight: 400; opacity: 0.9; font-size: 0.75rem;"><i class="ph ph-path"></i> ${final.kms.toFixed(1)} KM</span>
+                    </div>
+                    <div style="padding: 20px;">
+                        <div class="flex justify-between mb-2" style="color: #64748B; font-size: 0.9rem;">
+                            <span>Base ${cat === 'local' ? 'Package' : 'Fare'} (${final.kms.toFixed(0)} km)</span>
+                            <span style="font-weight: 600; color: var(--dark-800)">₹${final.base}</span>
+                        </div>
+                        ${final.bata > 0 ? `
+                        <div class="flex justify-between mb-2" style="color: #64748B; font-size: 0.9rem;">
+                            <span>Driver Bata</span>
+                            <span style="font-weight: 600; color: var(--dark-800)">₹${final.bata}</span>
+                        </div>` : ''}
+                        ${final.hill > 0 ? `
+                        <div class="flex justify-between mb-2" style="color: #64748B; font-size: 0.9rem;">
+                            <span>Hill Surcharge</span>
+                            <span style="font-weight: 600; color: var(--dark-800)">₹${final.hill}</span>
+                        </div>` : ''}
+                        
+                        <div class="flex justify-between mb-2" style="color: var(--primary); font-size: 0.9rem; font-weight: 600;">
+                            <span>Platform Fee (5%)</span>
+                            <span>₹${final.platformFee}</span>
+                        </div>
+                        
+                        <div style="margin: 15px 0; border-top: 1px dashed #E2E8F0;"></div>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span style="display: block; font-size: 0.75rem; color: #64748B; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Total Payable</span>
+                                <span style="font-size: 0.65rem; color: #94A3B8;">Incl. all taxes & fees</span>
+                            </div>
+                            <span style="font-size: 1.8rem; font-weight: 800; color: var(--primary); font-family: Outfit;">₹${final.total}</span>
+                        </div>
+                        <p style="font-size: 0.7rem; color: #94A3B8; margin-top: 15px; font-style: italic; border-left: 3px solid #E2E8F0; padding-left: 10px;">
+                            * Tolls, Parking and State Permits are extra as applicable.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        document.getElementById('taxiForm').onsubmit = async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('custName').value;
+            const phone = document.getElementById('custPhone').value;
+            const email = document.getElementById('custEmail') ? document.getElementById('custEmail').value : '';
+            if (!name || !phone || !email) {
+                Toast.show("Please enter name, phone, and email in Step 1", "warning");
+                return;
+            }
+
+            const btn = document.getElementById('taxiSubmitBtn');
+            btn.innerHTML = '<span class="spinner"></span> Dispatching request...';
+            btn.disabled = true;
+
+            const cat = document.getElementById('serviceCategory').value;
+            const vType = document.getElementById('vehicleType').value;
+            const fare = calculateFareWithFee(cat, vType);
+            const pickup = document.getElementById('pickupDisplay').innerText;
+            const dropoff = cat === 'local' ? 'Local Sightseeing' : document.getElementById('dropoff').value;
+
+            try {
+                const response = await fetch('/api/send-booking', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'taxi',
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        details: {
+                            serviceType: cat.toUpperCase(),
+                            pickup: pickup,
+                            drop: dropoff,
+                            dateTime: new Date().toLocaleString(),
+                            notes: `Vehicle: ${vType.toUpperCase()}, Passengers: ${document.getElementById('passengers').value}, Distance Estimate: ${fare.kms ? fare.kms.toFixed(1) : 0} km, Total Price: INR ${fare.total}`
+                        }
+                    })
+                });
+
+                const res = await response.json();
+                if (res.success) {
+                    Swal.fire({
+                        title: 'Cab Request Sent!',
+                        text: 'Your pilot request has been dispatched. We will contact you shortly via phone or email.',
+                        icon: 'success',
+                        confirmButtonColor: 'var(--primary)',
+                        confirmButtonText: 'Great!'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    throw new Error(res.error || 'Failed to dispatch ride request');
+                }
+            } catch (err) {
+                Toast.show(err.message, 'error');
+            } finally {
+                btn.innerHTML = '<i class="ph ph-sparkle"></i> Book Ride Now';
+                btn.disabled = false;
+            }
+        };
+
+        async function loadDrivers() {
+            try {
+                const data = await apiFetch('/taxi/drivers');
+                const grid = document.getElementById('driverGrid');
+                if (data.data.length === 0) {
+                    grid.innerHTML = `
+                        <div class="card" style="grid-column: 1/-1; border: 1px dashed var(--primary); text-align: center; padding: 2rem;">
+                            <i class="ph ph-clock-counter-clockwise" style="font-size: 2.5rem; color: var(--primary); opacity: 0.5;"></i>
+                            <h3 style="margin-top: 1rem;">Pilots are currently Offline</h3>
+                            <p class="text-muted">No pilots are currently active, but you can still <b>Request a Ride</b>. Your request will be broadcasted to all registered partners.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                grid.innerHTML = data.data.map(d => `
+                    <div class="card">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div style="width:50px;height:50px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem">
+                                <i class="ph ph-user"></i>
+                            </div>
+                            <div>
+                                <h3 style="font-size:1.1rem">${d.name}</h3>
+                                <p class="text-muted" style="font-size:0.85rem">${d.vehicle_model} • ${d.vehicle_number}</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span><i class="ph ph-star" style="color:var(--accent)"></i> ${d.rating} • ${d.total_trips} trips</span>
+                            <span class="badge ${d.is_available ? 'badge-green' : 'badge-red'}">${d.is_available ? 'Available' : 'On Trip'}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        let _taxiWatchId = null;
+
+        async function getLiveLocation() {
+            const status  = document.getElementById('geoStatus');
+            const display = document.getElementById('pickupDisplay');
+            const status2 = document.getElementById('geoStatus2');
+            const display2 = document.getElementById('pickupDisplay2');
+            const refetchBtn = document.querySelector('[onclick="getLiveLocation()"]');
+
+            const setStatus  = (html) => { if (status) status.innerHTML = html; if (status2) status2.innerHTML = html; };
+            const setDisplay = (html) => { if (display) display.innerHTML = html; if (display2) display2.innerHTML = html; };
+
+            if (!navigator.geolocation) {
+                setStatus('<i class="ph ph-warning" style="color:var(--red)"></i> GPS not supported');
+                return;
+            }
+
+            if (_taxiWatchId !== null) {
+                navigator.geolocation.clearWatch(_taxiWatchId);
+                _taxiWatchId = null;
+            }
+
+            setStatus('<span class="spinner"></span> Detecting GPS...');
+            setDisplay('Acquiring signal...');
+            if (refetchBtn) {
+                refetchBtn.disabled = true;
+                refetchBtn.innerHTML = '<span class="spinner"></span> Fixing...';
+            }
+
+            const startTime = Date.now();
+            const MAX_WAIT_MS = 12000;
+            const IDEAL_ACCURACY = 30;
+            const GOOD_ENOUGH_ACCURACY = 80;
+            const MIN_WAIT_MS = 3000;
+            let bestPos = null;
+
+            const timer = setTimeout(() => {
+                stopWatching();
+                if (bestPos) {
+                    _finalizePickup(bestPos, setStatus, setDisplay, refetchBtn);
+                } else {
+                    setStatus('<i class="ph ph-warning-circle" style="color:var(--red)"></i> Weak GPS Signal');
+                    setDisplay('Please move outdoors');
+                    if (refetchBtn) {
+                        refetchBtn.disabled = false;
+                        refetchBtn.innerText = 'Retry GPS';
+                    }
+                }
+            }, MAX_WAIT_MS);
+
+            _taxiWatchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    const acc = pos.coords.accuracy;
+                    const elapsed = Date.now() - startTime;
+                    
+                    setStatus(`<span class="spinner"></span> Signal: ±${Math.round(acc)}m`);
+
+                    if (!bestPos || acc < bestPos.coords.accuracy) bestPos = pos;
+
+                    if (acc <= IDEAL_ACCURACY || (acc <= GOOD_ENOUGH_ACCURACY && elapsed >= MIN_WAIT_MS)) {
+                        stopWatching();
+                        _finalizePickup(bestPos, setStatus, setDisplay, refetchBtn);
+                    }
+                },
+                (err) => {
+                    stopWatching();
+                    if (err.code === 2) {
+                        Swal.fire({
+                            title: 'GPS is Disabled',
+                            text: 'Please turn on Location/GPS in your device settings to detect your pickup point automatically.',
+                            icon: 'location',
+                            confirmButtonText: 'Retry Now',
+                            confirmButtonColor: 'var(--primary)'
+                        }).then(() => getLiveLocation());
+                    } else {
+                        Toast.show(err.message || "GPS error", "error");
+                    }
+                    
+                    setStatus('<i class="ph ph-warning" style="color:var(--red)"></i> Location Error');
+                    setDisplay('Manual entry required');
+                    if (refetchBtn) {
+                        refetchBtn.disabled = false;
+                        refetchBtn.innerText = 'Refresh GPS';
+                    }
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+
+            function stopWatching() {
+                clearTimeout(timer);
+                if (_taxiWatchId !== null) {
+                    navigator.geolocation.clearWatch(_taxiWatchId);
+                    _taxiWatchId = null;
+                }
+            }
+        }
+
+        async function _finalizePickup(pos, setStatus, setDisplay, refetchBtn) {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            const acc = Math.round(pos.coords.accuracy);
+
+            document.getElementById('pLat').value = lat;
+            document.getElementById('pLng').value = lng;
+
+            try {
+                const url  = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`;
+                const res  = await fetch(url);
+                const data = await res.json();
+                const streetPart = [data.streetNumber || '', data.street || ''].filter(Boolean).join(' ');
+                const parts = [streetPart, data.locality || data.city, data.principalSubdivision, data.countryName].filter(Boolean);
+                const addr  = parts.join(', ') || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+                setDisplay(`<i class="ph ph-map-pin" style="color:var(--primary)"></i> ${addr}`);
+                setStatus(`<i class="ph ph-check-circle" style="color:var(--success)"></i> GPS Locked ±${acc}m`);
+            } catch (e) {
+                setDisplay(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                setStatus(`<i class="ph ph-check-circle" style="color:var(--success)"></i> GPS Locked ±${acc}m`);
+            }
+
+            if (destMap) destMap.setView([lat, lng], 14);
+            if (refetchBtn) { 
+                refetchBtn.disabled = false; 
+                refetchBtn.innerHTML = '<i class="ph ph-arrows-clockwise"></i> Refresh GPS'; 
+            }
+            updateEstimation();
+        }
+
+        let currentActiveRideId = null;
+        let currentActiveRideStatus = null;
+        let currentActiveRidePayment = null;
+
+        async function checkActiveRide() {
+            if (!Auth.isLoggedIn()) return;
+            try {
+                const res = await apiFetch('/auth/dashboard-summary');
+                const allBookings = res.data?.bookings || res.data || [];
+                const taxiBookings = allBookings.filter(b => b.module_type === 'taxi');
+                
+                // Find the first ride that is actually active (not cancelled/completed)
+                const activeRide = taxiBookings.find(b => {
+                    const isActiveStatus = ['placed', 'confirmed', 'accepted', 'arrived', 'in_progress'].includes(b.booking_status);
+                    const isPendingPayment = b.booking_status === 'completed' && b.payment_status === 'pending';
+                    return isActiveStatus || isPendingPayment;
+                });
+                
+                if (activeRide) {
+                    if (currentActiveRideId === activeRide.id && 
+                        currentActiveRideStatus === activeRide.booking_status &&
+                        currentActiveRidePayment === activeRide.payment_status) return;
+                    
+                    currentActiveRideId = activeRide.id;
+                    currentActiveRideStatus = activeRide.booking_status;
+                    currentActiveRidePayment = activeRide.payment_status;
+
+                    document.getElementById('taxiFormBox').classList.add('hidden');
+                    document.getElementById('rideDashboard').classList.remove('hidden');
+                    renderRideDashboard(activeRide);
+                } else {
+                    currentActiveRideId = null;
+                    document.getElementById('taxiFormBox').classList.remove('hidden');
+                    document.getElementById('rideDashboard').classList.add('hidden');
+                }
+            } catch(e) { console.warn('checkActiveRide:', e.message); }
+        }
+
+        function renderRideDashboard(b) {
+            const dash = document.getElementById('rideDashboard');
+            const statusOrder = ['placed', 'accepted', 'arrived', 'in_progress', 'completed'];
+            const currentIndex = statusOrder.indexOf(b.booking_status);
+            
+            const createdAt = new Date(b.created_at).getTime();
+            const elapsedSecs = Math.floor((Date.now() - createdAt) / 1000);
+            const canCancel = ['placed', 'confirmed', 'pending', 'requested'].includes(b.booking_status);
+            const remainingSecs = 0; // No longer needed but kept for backward compatibility if referenced elsewhere temporarily
+
+            const steps = [
+                { label: 'Requested', icon: 'ph-broadcast' },
+                { label: 'Accepted', icon: 'ph-check-circle' },
+                { label: 'Arrived', icon: 'ph-map-pin' },
+                { label: 'On Trip', icon: 'ph-steering-wheel' },
+                { label: 'Finished', icon: 'ph-flag-checkered' }
+            ];
+
+            const stepperHtml = `
+                <div class="stepper mb-6 mt-2">
+                    ${steps.map((s, idx) => `
+                        <div class="step ${idx <= currentIndex ? 'active' : ''}">
+                            <div class="step-icon"><i class="ph ${s.icon}"></i></div>
+                            <span class="step-label">${s.label}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            let mainContent = '';
+            if (b.booking_status === 'placed' || b.booking_status === 'confirmed') {
+                mainContent = `
+                    <div class="text-center py-6">
+                        <div class="spinner-lg mb-4"></div>
+                        <h2 style="font-family:Outfit; margin-bottom:0.5rem">Finding Your Pilot</h2>
+                        <p class="text-muted">Broadcasted to all nearby pilots in Yercaud. Please wait a moment.</p>
+                    </div>
+                `;
+            } else if (b.booking_status === 'completed') {
+                mainContent = `
+                    <div class="text-center py-6">
+                        <div style="width:80px; height:80px; background:#DCFCE7; color:#166534; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:3rem; margin:0 auto 1.5rem; border: 4px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
+                            <i class="ph ph-flag-checkered"></i>
+                        </div>
+                        <h2 style="font-family:Outfit; margin-bottom:0.5rem">Trip Finished!</h2>
+                        <p class="text-muted">Hope you had a pleasant ride with Book&Sync.</p>
+                    </div>
+                `;
+            } else {
+                mainContent = `
+                    <div class="flex items-center gap-4 p-4 mb-6" style="background:#F8FAFC; border-radius:20px; border:1px solid #E2E8F0">
+                        <div style="width:65px; height:65px; background:var(--primary); color:white; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:2rem; box-shadow:0 8px 16px rgba(0,0,0,0.1)">
+                            <i class="ph ph-user"></i>
+                        </div>
+                        <div style="flex:1">
+                            <h3 style="margin:0; font-size:1.2rem">${b.driver_name || 'Pilot Assigned'}</h3>
+                            <p style="margin:2px 0 0; font-size:0.9rem; color:#64748B">${b.vehicle_model || 'Premium Cab'} • <b style="color:var(--dark-800)">${b.vehicle_number || ''}</b></p>
+                        </div>
+                        <a href="tel:${b.driver_phone}" class="btn-icon shadow-lg" style="background:var(--success); color:white; width:48px; height:48px; font-size:1.2rem"><i class="ph ph-phone"></i></a>
+                    </div>
+                `;
+            }
+
+            dash.innerHTML = `
+                ${stepperHtml}
+                <div style="background:white; border-radius:24px; border:1px solid #F1F5F9; padding:1.5rem; margin-bottom:1.5rem;">
+                    ${mainContent}
+                    <div style="background:#F8FAFC; border-radius:16px; padding:15px; border:1px solid #E2E8F0">
+                        <div class="flex justify-between mb-2"><span>Booking ID</span><span class="font-bold">#TAXI-${b.id}</span></div>
+                        <div class="flex justify-between"><span>Total Fare</span><span class="font-bold text-primary">₹${b.total_amount}</span></div>
+                    </div>
+                    ${(b.booking_status === 'accepted' || b.booking_status === 'arrived' || b.booking_status === 'in_progress') ? `
+                        <div class="mt-4 p-4 text-center" style="background:var(--primary-light); color:var(--primary); border-radius:16px;">
+                            <span style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; display:block; opacity:0.7;">Verification OTP</span>
+                            <span style="font-size:2.2rem; font-weight:800; letter-spacing:6px">${b.otp_end || '----'}</span>
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="flex flex-col gap-3">
+                    ${b.payment_status === 'pending' ? `
+                        <button class="btn btn-primary btn-full" onclick="payTaxi(${b.id}, ${b.total_amount})">
+                            <i class="ph ph-credit-card"></i> Pay Now (₹${b.total_amount})
+                        </button>
+                    ` : `
+                        <div style="background: #DCFCE7; color: #166534; padding: 12px; border-radius: 14px; text-align: center; font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid #BBF7D0;">
+                            <i class="ph ph-check-circle" style="font-size: 1.2rem;"></i> PAYMENT SUCCESSFUL
+                        </div>
+                    `}
+                    ${canCancel ? `
+                        <button class="btn btn-danger-outline btn-full" onclick="cancelRide(${b.id})">
+                            <i class="ph ph-x-circle"></i> Cancel Ride Request
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function cancelRide(id) {
+            if (!id) return;
+            
+            Swal.fire({
+                title: 'Cancel Ride Request?',
+                text: "Are you sure you want to cancel this ride? This action cannot be undone.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Yes, Cancel It!',
+                cancelButtonText: 'No, Keep It',
+                borderRadius: '20px',
+                customClass: {
+                    popup: 'premium-swal-popup'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    proceedWithCancel(id);
+                }
+            });
+        }
+
+        async function proceedWithCancel(id) {
+            console.log("Proceeding with cancellation for ID:", id);
+            try {
+                const btn = document.querySelector(`button[onclick^="cancelRide"]`);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner"></span> Cancelling...';
+                }
+
+                const res = await apiFetch('/auth/bookings/' + id + '/cancel', { 
+                    method: 'POST',
+                    role: 'customer'
+                });
+                
+                if (res.success) {
+                    Toast.show("Ride request cancelled", "success");
+                    setTimeout(() => location.reload(), 1200);
+                } else {
+                    throw new Error(res.error || "Failed to cancel");
+                }
+            } catch(e) { 
+                console.error('Cancel Ride Error:', e);
+                Toast.show(e.message || "Could not cancel ride", 'error'); 
+                const btn = document.querySelector(`button[onclick^="cancelRide"]`);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="ph ph-x-circle"></i> Cancel Ride Request';
+                }
+            }
+        }
+
+        async function payTaxi(bookingId, amount) {
+            try {
+                const paymentData = await apiFetch('/payment/create', { method: 'POST', body: { amount, bookingId } });
+                await apiFetch('/payment/verify', { 
+                    method: 'POST', 
+                    body: { 
+                        razorpayPaymentId: 'pay_mock_' + Date.now(),
+                        razorpayOrderId: paymentData.data.razorpayOrderId,
+                        razorpaySignature: 'mock_signature',
+                        bookingId 
+                    } 
+                });
+                location.reload();
+            } catch (err) { Toast.show(err.message, 'error'); }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDestMap();
+            setTimeout(getLiveLocation, 800);
+            checkActiveRide();
+            setInterval(checkActiveRide, 3000);
+        });
+    </script>
+
+</body>
+</html>

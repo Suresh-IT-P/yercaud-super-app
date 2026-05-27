@@ -1,7 +1,7 @@
 {
-  "name": "y360-landing",
+  "name": "bookandsync-landing",
   "version": "1.0.0",
-  "description": "Y360 — Yercaud Tourism Landing Page (Serverless)",
+  "description": "Book&Sync — Yercaud Tourism Landing Page (Serverless)",
   "private": true,
   "scripts": {
     "dev": "vercel dev",

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support | Book&Sync</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="support-panel">
+        <div class="panel-header">
+            <a href="index" class="back-btn" style="width: 36px; height: 36px;"><i class="ph ph-caret-left"></i></a>
+            <h2 class="panel-name">Help & Support</h2>
+        </div>
+
+        <div class="support-header" style="margin-top: 20px;">
+            <h1>Support</h1>
+        </div>
+
+        <a href="tel:+918220679754" class="support-contact-card">
+            <div class="contact-icon">
+                <i class="ph ph-phone"></i>
+            </div>
+            <div class="contact-info">
+                <h3>Call Support</h3>
+                <p>+91 82206 79754</p>
+            </div>
+        </a>
+
+        <a href="mailto:sureshit2005@gmail.com" class="support-contact-card">
+            <div class="contact-icon">
+                <i class="ph ph-envelope"></i>
+            </div>
+            <div class="contact-info">
+                <h3>Email Us</h3>
+                <p>sureshit2005@gmail.com</p>
+            </div>
+        </a>
+
+        <div class="faq-section">
+            <h2>FAQs</h2>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>How to book a taxi?</span>
+                    <i class="ph ph-caret-right" style="transition: transform 0.3s ease;"></i>
+                </div>
+                <div class="faq-answer" style="display: none; padding-top: 12px; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; color: #94a3b8; line-height: 1.5;">
+                    Navigate to the "Home" screen, select "Taxi Services", choose your pickup and drop-off locations, pick your preferred vehicle type, and confirm the booking. You will be matched with a pilot instantly.
+                </div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Cancellation policy</span>
+                    <i class="ph ph-caret-right" style="transition: transform 0.3s ease;"></i>
+                </div>
+                <div class="faq-answer" style="display: none; padding-top: 12px; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; color: #94a3b8; line-height: 1.5;">
+                    You can cancel your bookings for free up to 2 hours before the scheduled time. Cancellations made within 2 hours may incur a small cancellation fee depending on the service.
+                </div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Payment methods</span>
+                    <i class="ph ph-caret-right" style="transition: transform 0.3s ease;"></i>
+                </div>
+                <div class="faq-answer" style="display: none; padding-top: 12px; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; color: #94a3b8; line-height: 1.5;">
+                    We support direct email booking request inquiries. All reservations are coordinated and finalized offline with the service providers.
+                </div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Loyalty rewards</span>
+                    <i class="ph ph-caret-right" style="transition: transform 0.3s ease;"></i>
+                </div>
+                <div class="faq-answer" style="display: none; padding-top: 12px; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; color: #94a3b8; line-height: 1.5;">
+                    Our loyalty program is currently being upgraded. In the future, you will earn reward points for every booking which can be redeemed for exclusive discounts.
+                </div>
+            </div>
+        </div>
+
+        <div class="concierge-card">
+            <h3>24/7 Concierge</h3>
+            <p>Our premium concierge service is available around the clock to ensure your Yercaud stay is perfect. Contact us for special requests.</p>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="ph ph-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="rooms.html" class="nav-item">
+            <i class="ph ph-buildings"></i>
+            <span>Stays</span>
+        </a>
+        <a href="support.html" class="nav-item active">
+            <i class="ph ph-headphones"></i>
+            <span>Support</span>
+        </a>
+    </nav>
+
+    <script src="js/app.js"></script>
+    <script>
+        function toggleFaq(el) {
+            const answer = el.querySelector('.faq-answer');
+            const icon = el.querySelector('i.ph-caret-right');
+            
+            // Close all other FAQs
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if (item !== el) {
+                    item.querySelector('.faq-answer').style.display = 'none';
+                    item.querySelector('i.ph-caret-right').style.transform = 'rotate(0deg)';
+                }
+            });
+
+            // Toggle current FAQ
+            if (answer.style.display === 'none') {
+                answer.style.display = 'block';
+                icon.style.transform = 'rotate(90deg)';
+            } else {
+                answer.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+</body>
+</html>

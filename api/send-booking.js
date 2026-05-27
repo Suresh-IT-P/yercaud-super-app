@@ -15,6 +15,7 @@ module.exports = async (req, res) => {
     }
 
     try {
+        console.log('[API send-booking] Received request body:', req.body);
         const { type, name, email, phone, details } = req.body;
 
         if (!name || !email || !phone || !type) {
@@ -186,6 +187,28 @@ module.exports = async (req, res) => {
                 `);
                 break;
 
+            case 'food':
+                subject = `🍔 Food Order — ${name}`;
+                htmlBody = baseTemplate('Food Delivery Order', `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 12px 0; color: #6b7280; font-size: 14px;">Restaurant</td>
+                        <td style="padding: 12px 0; font-weight: 600; text-align: right;">${details.restaurantName || 'N/A'}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 12px 0; color: #6b7280; font-size: 14px;">Items Ordered</td>
+                        <td style="padding: 12px 0; font-weight: 600; text-align: right;">${details.itemsList || 'N/A'}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 12px 0; color: #6b7280; font-size: 14px;">Delivery Address</td>
+                        <td style="padding: 12px 0; font-weight: 600; text-align: right;">${details.deliveryAddress || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px 0; color: #6b7280; font-size: 14px;">Total Amount</td>
+                        <td style="padding: 12px 0; font-weight: 600; text-align: right; color: #22c55e;">INR ${details.totalAmount || '0'}</td>
+                    </tr>
+                `);
+                break;
+
             default:
                 subject = `📩 General Inquiry — ${name}`;
                 htmlBody = baseTemplate('General Inquiry', `
@@ -218,9 +241,12 @@ module.exports = async (req, res) => {
             
             if (!response.ok) {
                 const err = await response.text();
+                console.error('[API send-booking] Brevo Error Response:', err);
                 throw new Error(`Brevo API Error: ${err}`);
             }
-            return response.json();
+            const resJson = await response.json();
+            console.log('[API send-booking] Brevo Success Response:', resJson);
+            return resJson;
         };
 
         // 1. Send email to business owner

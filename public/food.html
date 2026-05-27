@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentic Yercaud Food Delivery | Book&Sync</title>
+    <meta name="description" content="Craving local Yercaud flavors? Order authentic South Indian, Continental, and local hill station delicacies from the best restaurants in Yercaud via Book&Sync.">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Razorpay script removed -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* ── Premium Dark Design System ─── */
+        :root {
+            --dark-bg: #0B1121;
+            --card-bg: #1E293B;
+            --card-hover: #2D3748;
+            --text-main: #F1F5F9;
+            --text-muted: #94A3B8;
+            --primary: #2D5A27;
+            --primary-light: #3a7532;
+            --accent: #E8A83A;
+        }
+
+        body { background: var(--dark-bg); color: var(--text-main); font-family: 'Inter', sans-serif; }
+        .bg-light { background: var(--dark-bg) !important; }
+        
+        /* ── Hero Section ─── */
+        .hero-premium {
+            height: 45vh; min-height: 380px; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; padding-top: 80px;
+        }
+        .hero-bg {
+            position: absolute; inset: 0; background-size: cover; background-position: center;
+            filter: brightness(0.6); transform: scale(1.05); transition: 0.8s;
+        }
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, rgba(11,17,33,0.8), rgba(11,17,33,0.4));
+        }
+        .hero-content { position: relative; z-index: 10; text-align: center; max-width: 800px; padding: 0 20px; }
+        .hero-badge {
+            display: inline-block; padding: 6px 16px; border-radius: 30px;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem;
+            font-weight: 800; letter-spacing: 2px; color: var(--accent); margin-bottom: 1rem;
+        }
+        .hero-content h1 { font-family: 'Outfit'; font-size: 3.5rem; font-weight: 900; line-height: 1.1; margin-bottom: 1rem; }
+        
+        /* ── Restaurant Selection ─── */
+        .restaurant-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem; margin-top: 1.5rem;
+        }
+        .res-card {
+            background: var(--card-bg); border-radius: 28px; overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.05); cursor: pointer; position: relative;
+        }
+        .res-card:hover { transform: translateY(-10px); background: var(--card-hover); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .res-card-img { height: 200px; position: relative; overflow: hidden; }
+        .res-card-img img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
+        .res-card:hover .res-card-img img { transform: scale(1.1); }
+        .res-info { padding: 1.5rem; }
+        .res-name { font-family: 'Outfit'; font-weight: 800; font-size: 1.4rem; color: #fff; margin-bottom: 6px; }
+        .res-meta { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 10px; }
+
+        /* ── Menu Header ─── */
+        .menu-view-header {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 2.5rem; padding: 1.5rem;
+            background: var(--card-bg); border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .menu-back-btn {
+            width: 48px; height: 48px; border-radius: 14px;
+            background: var(--card-hover); color: white; border: none;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; cursor: pointer; transition: 0.3s;
+        }
+        .menu-back-btn:hover { background: var(--primary); transform: scale(1.1); }
+
+        /* ── Filter Pills ─── */
+        .menu-filter-bar { display: flex; gap: 12px; margin-bottom: 3rem; overflow-x: auto; scrollbar-width: none; }
+        .filter-pill {
+            padding: 12px 24px; border-radius: 16px; background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; gap: 8px; white-space: nowrap;
+        }
+        .filter-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* ── Food Cards ─── */
+        .food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2.5rem; }
+        .food-card {
+            background: var(--card-bg); border-radius: 32px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.4s;
+            display: flex; flex-direction: column; height: 100%;
+        }
+        .food-card:hover { transform: translateY(-8px); background: var(--card-hover); }
+        .food-image-box { height: 220px; position: relative; overflow: hidden; }
+        .food-image-box img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .food-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+        .food-title { font-size: 1.3rem; font-weight: 800; color: #fff; margin-bottom: 8px; font-family: 'Outfit'; }
+        .food-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem; flex: 1; }
+        .food-footer { display: flex; justify-content: space-between; align-items: center; }
+        .food-price { font-size: 1.5rem; font-weight: 900; color: #fff; font-family: 'Outfit'; }
+        .add-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 12px 28px; border-radius: 16px; font-weight: 800;
+            cursor: pointer; transition: 0.3s;
+        }
+        .add-btn:hover { background: var(--primary-light); transform: scale(1.05); }
+
+        .veg-tag {
+            position: absolute; top: 12px; left: 12px;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            border-radius: 8px; padding: 5px; z-index: 5;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .veg-tag .dot-border { width: 16px; height: 16px; border: 2px solid #ccc; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
+        .veg-tag.veg .dot-border { border-color: #22c55e; }
+        .veg-tag.nonveg .dot-border { border-color: #ef4444; }
+        .veg-tag .dot { width: 6px; height: 6px; border-radius: 50%; }
+        .veg-tag.veg .dot { background: #22c55e; }
+        .veg-tag.nonveg .dot { background: #ef4444; }
+
+        /* ── Mobile Optimization ─── */
+        @media (max-width: 768px) {
+            .hero-premium { height: 35vh; min-height: 300px; }
+            .hero-content h1 { font-size: 2.5rem; }
+            .food-grid { grid-template-columns: 1fr !important; gap: 1.2rem; }
+            .food-card { 
+                flex-direction: row; height: auto; padding: 12px; gap: 12px;
+                border-radius: 28px; align-items: center;
+            }
+            .food-image-box { width: 110px; height: 110px; min-width: 110px; border-radius: 20px; }
+            .food-body { padding: 4px 0; }
+            .food-title { font-size: 1.15rem; margin-bottom: 4px; }
+            .food-desc { display: none; }
+            .food-price { font-size: 1.25rem; }
+            .add-btn { padding: 8px 20px; font-size: 0.85rem; border-radius: 12px; }
+            
+            .menu-section-header h3 { font-size: 1.6rem !important; }
+        }
+
+        /* ── Order Tracking Dark ─── */
+        .stepper { display: flex; justify-content: space-between; position: relative; margin-bottom: 2.5rem; padding: 0 5px; }
+        .stepper::before { content: ''; position: absolute; top: 20px; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.05); z-index: 1; border-radius: 10px; }
+        .stepper-progress { position: absolute; top: 20px; left: 0; height: 4px; background: #4ade80; z-index: 1; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px; box-shadow: 0 0 15px rgba(74, 222, 128, 0.3); }
+        .step { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 12px; flex: 1; min-width: 60px; }
+        .step-icon { width: 42px; height: 42px; background: #1E293B; border: 2px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.1rem; transition: 0.5s; }
+        .step.active .step-icon { background: #1E293B; border-color: #4ade80; color: #4ade80; box-shadow: 0 0 20px rgba(74, 222, 128, 0.2); transform: scale(1.1); }
+        .step.completed .step-icon { background: #4ade80; border-color: #4ade80; color: #1E293B; }
+        .step-label { font-size: 0.65rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s; text-align: center; line-height: 1.2; }
+        .step.active .step-label { color: #4ade80; text-shadow: 0 0 8px rgba(74, 222, 128, 0.3); }
+
+        .category-count { background: rgba(255,255,255,0.1); color: var(--text-muted); padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; }
+        .menu-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .menu-section-header h3 { font-family: 'Outfit'; font-weight: 800; font-size: 1.8rem; }
+
+        .desktop-hide { display: none !important; }
+        @media (max-width: 640px) { .mobile-hide { display: none !important; } .desktop-hide { display: block !important; } }
+        
+        .reveal { opacity: 0; transform: translateY(20px); animation: revealUp 0.6s forwards cubic-bezier(0.23, 1, 0.32, 1); }
+        @keyframes revealUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* ── Floating Cart (Premium) ─── */
+        .cart-float {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(150px);
+            width: calc(100% - 40px); max-width: 500px;
+            background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(15px);
+            color: white; padding: 14px 20px; border-radius: 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); z-index: 1000;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+        }
+        .cart-float.active { transform: translateX(-50%) translateY(0); }
+        .cart-float:hover { transform: translateX(-50%) translateY(-6px); border-color: var(--primary-light); }
+        
+        .cart-float-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 10px 24px; border-radius: 14px; font-weight: 800;
+            font-size: 0.9rem; transition: 0.3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .cart-float:hover .cart-float-btn { background: var(--primary-light); transform: scale(1.03); }
+
+        /* ── Refined Buttons ─── */
+        .add-btn {
+            background: rgba(45, 90, 39, 0.1); color: #4ade80; 
+            border: 1.5px solid rgba(74, 222, 128, 0.3);
+            padding: 8px 24px; border-radius: 12px; font-weight: 800;
+            cursor: pointer; transition: 0.3s; font-size: 0.85rem;
+        }
+        .add-btn:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); }
+        .add-btn:active { transform: translateY(0); }
+
+        /* Dark Nav Fix */
+        nav.scrolled {
+            background: rgba(11, 17, 33, 0.9) !important;
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        nav .nav-links a { color: rgba(255,255,255,0.7) !important; }
+        nav .nav-links a:hover { color: white !important; }
+        nav .logo { color: white !important; }
+        @media (max-width: 768px) {
+            .step-icon { width: 34px !important; height: 34px !important; font-size: 0.9rem !important; }
+            .stepper::before, .stepper-progress { top: 17px !important; }
+            
+            .hero-premium { height: 35vh !important; min-height: 280px !important; padding-top: 20px !important; }
+            .hero-content h1 { font-size: 1.8rem !important; }
+            .hero-content p { font-size: 0.85rem !important; }
+            #navbar { display: none !important; }
+            .mobile-hide { display: none !important; }
+            #mainContent { margin-top: 0 !important; }
+        }
+
+        .mobile-header-bar {
+            display: none;
+            background: #0B1121;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky; top: 0; z-index: 1100;
+        }
+        @media (max-width: 768px) {
+            .mobile-header-bar { display: block; }
+        }
+
+        .back-circle-btn {
+            width: 44px; height: 44px; border-radius: 15px;
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            color: white; border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 1.2rem;
+        }
+        .back-circle-btn:hover { background: var(--primary); border-color: var(--primary); transform: scale(1.1); color: white; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="mobile-header-bar">
+        <div class="container flex items-center gap-4">
+            <a href="index.html" class="back-circle-btn"><i class="ph ph-caret-left"></i></a>
+            <div>
+                <h1 style="margin:0; font-size: 1.1rem; font-family: Outfit; font-weight: 800; color: white;">Food</h1>
+                <p style="margin:0; font-size: 0.65rem; color: #4ade80; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">taste with care</p>
+            </div>
+        </div>
+    </div>
+
+    <nav id="navbar"></nav>
+
+    <div class="hero-premium">
+        <div class="hero-bg" style="background-image: url('yercaud_local_food_1777705322047.png');"></div>
+        <div class="hero-overlay"></div>
+        
+        <div class="container mobile-hide" style="position: absolute; top: 30px; left: 0; right: 0; z-index: 100;">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="back-circle-btn"><i class="ph ph-caret-left"></i></a>
+                <div>
+                    <h2 style="margin:0; font-family:Outfit; font-size: 1.4rem; font-weight: 800; color: white;">Food</h2>
+                    <p style="margin:0; font-size: 0.75rem; color: #4ade80; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">taste with care</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container hero-content">
+            <span class="hero-badge reveal active">HILLSIDE DELIGHTS</span>
+            <h1 class="reveal active">Experience Authentic Yercaud</h1>
+            <p class="reveal active" style="color: var(--text-muted); font-size: 1.1rem;">Savor the local hill-station flavors delivered hot to your doorstep.</p>
+        </div>
+    </div>
+
+    </div>
+    
+    <div id="mainContent" class="container" style="margin-top: -60px; position: relative; z-index: 10; padding-bottom: 100px;">
+        <div id="restaurantSelectionView">
+            <div class="flex justify-between items-end mb-6">
+                <div>
+                    <h2 class="reveal active" style="font-family:Outfit; font-weight: 900; font-size: 2.2rem; margin: 0;">Local Kitchens</h2>
+                    <p class="reveal active" style="color: var(--text-muted); font-size: 1rem;">Curated collection of Yercaud's finest eateries.</p>
+                </div>
+            </div>
+
+            <div id="orderTracking" class="hidden"></div>
+
+            <div class="restaurant-grid" id="restaurantGrid"></div>
+        </div>
+
+        <div id="menuView" class="hidden">
+            <div class="menu-view-header">
+                <button class="menu-back-btn" onclick="showRestaurants()"><i class="ph ph-arrow-left"></i></button>
+                <div class="menu-view-title">
+                    <h2 id="currentRestaurantName" style="font-family:Outfit; margin:0; font-weight:900; font-size: 2rem;">Menu</h2>
+                    <span class="badge" style="background: rgba(45,90,39,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); font-size:0.6rem; letter-spacing:1px;">OPEN & SERVING</span>
+                </div>
+            </div>
+
+            <div class="menu-filter-bar reveal" id="foodFilters">
+                <button class="filter-pill active" onclick="filterFood('all')" data-filter="all"><i class="ph ph-fork-knife"></i> All Dishes</button>
+                <button class="filter-pill" onclick="filterFood('veg')" data-filter="veg"><i class="ph ph-leaf"></i> Veg Only</button>
+            </div>
+
+            <div id="menuContainer"></div>
+        </div>
+    </div>
+
+    <!-- Floating Cart Widget -->
+    <div id="cartFloat" class="cart-float" onclick="Cart.toggle()">
+        <div class="flex items-center gap-4">
+            <div style="background: var(--primary); color: white; width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                <i class="ph ph-shopping-bag" style="font-size: 1.5rem"></i>
+            </div>
+            <div>
+                <p id="floatCount" style="font-size: 0.7rem; font-weight: 800; margin: 0; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">0 Items</p>
+                <h4 id="floatTotal" style="font-family: Outfit; margin: 0; font-size: 1.4rem; font-weight: 900; color: white;">₹0</h4>
+            </div>
+        </div>
+        <button class="cart-float-btn">CHECKOUT <i class="ph ph-arrow-right"></i></button>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-overlay" onclick="Cart.toggle()"></div>
+    <div class="cart-sidebar" id="cartSidebar" style="background: var(--card-bg); border-left: 1px solid rgba(255,255,255,0.05);">
+        <div class="cart-header" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <h3 style="font-family:Outfit; color: white;"><i class="ph ph-shopping-bag-open"></i> Your Order</h3>
+            <button class="close-btn" onclick="Cart.toggle()" style="color: var(--text-muted);"><i class="ph ph-x"></i></button>
+        </div>
+        <div class="cart-items" id="cartItems" style="padding: 20px;"></div>
+        <div class="cart-footer" style="background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.05); padding: 20px;">
+            <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+                <div class="flex justify-between mb-2"><span>Subtotal</span><span id="cartSubtotal" style="color: white; font-weight: 700;">₹0</span></div>
+                <div class="flex justify-between mb-2"><span style="color: var(--text-muted);">Delivery</span><span style="color: #4ade80;">₹30</span></div>
+                <div class="flex justify-between pt-3" style="border-top:1px solid rgba(255,255,255,0.05); font-weight:900; font-size:1.4rem; color: white;">
+                    <span>Total</span><span id="cartTotal">₹0</span>
+                </div>
+            </div>
+
+            <div class="contact-section mb-4">
+                <label style="display:block; color: var(--text-muted); font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Contact Details</label>
+                <input type="text" id="orderCustName" placeholder="Your Full Name" 
+                       style="width:100%; padding:12px; font-size:0.85rem; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); color: white; margin-bottom: 8px;" required>
+                <input type="tel" id="orderCustPhone" placeholder="Mobile Number (for delivery rider)" 
+                       style="width:100%; padding:12px; font-size:0.85rem; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); color: white; margin-bottom: 8px;" required>
+                <input type="email" id="orderCustEmail" placeholder="Email Address (for order confirmation)" 
+                       style="width:100%; padding:12px; font-size:0.85rem; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); color: white;" required>
+            </div>
+
+            <div class="location-section mb-4">
+                <label style="display:block; color: var(--text-muted); font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Delivery Destination</label>
+                <button id="locationBtn" class="btn btn-outline btn-full mb-2" onclick="Location.detect()" style="border-radius: 12px; border-color: rgba(255,255,255,0.1); color: var(--text-muted); font-size: 0.85rem;">
+                    <i class="ph ph-navigation-arrow"></i> Use Current Location
+                </button>
+                <div id="locationDisplay" class="p-3 text-muted mb-2" style="font-size: 0.8rem; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); display: none;"></div>
+                
+                <div id="locationFallback" class="hidden">
+                    <input type="text" id="manualLocation" placeholder="e.g. Near Lake / Hotel Grand Room 302" 
+                           style="width:100%; padding:12px; font-size:0.85rem; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); color: white;"
+                           onchange="Location.setManual(this.value)">
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-full btn-checkout" onclick="Cart.checkout()" style="padding: 18px; border-radius: 18px; font-size: 1.1rem; font-weight: 800;">Place Order <i class="ph ph-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        UI.renderNavbar(true);
+        let allItems = [];
+        let restaurants = [];
+
+        async function loadRestaurants() {
+            try {
+                const res = await apiFetch('/food/restaurants');
+                restaurants = res.data;
+                const grid = document.getElementById('restaurantGrid');
+                
+                grid.innerHTML = restaurants.map(v => `
+                    <div class="res-card reveal" onclick="selectVendor(${v.id})">
+                        <div class="res-card-img">
+                            <img src="${v.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80'}" alt="${v.vendor_name}">
+                            <div style="position: absolute; bottom: 15px; right: 15px; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); padding: 4px 10px; border-radius: 8px; color: white; font-size: 0.75rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.1);">
+                                <i class="ph ph-star-fill" style="color:#fbbf24"></i> 4.5
+                            </div>
+                        </div>
+                        <div class="res-info">
+                            <h3 class="res-name">${v.business_name}</h3>
+                            <div class="res-meta">
+                                <i class="ph ph-map-pin"></i> <span>${v.address || 'Yercaud Hills'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { 
+                document.getElementById('restaurantGrid').innerHTML = `<div class="card p-5 text-center">Error: ${e.message}</div>`;
+            }
+        }
+
+        async function selectVendor(id) {
+            const vendor = restaurants.find(r => r.id == id);
+            if (vendor) document.getElementById('currentRestaurantName').innerText = vendor.business_name;
+            
+            document.getElementById('restaurantSelectionView').classList.add('hidden');
+            document.getElementById('menuView').classList.remove('hidden');
+            document.getElementById('menuContainer').innerHTML = '<div class="text-center py-5"><span class="spinner" style="border-top-color:var(--primary)"></span></div>';
+            
+            try {
+                const mData = await apiFetch(`/food/menu/${id}`);
+                allItems = mData.data.map(item => ({ ...item, vendor_id: id }));
+                renderMenu(allItems);
+            } catch (e) {
+                document.getElementById('menuContainer').innerHTML = `<div class="card p-5 text-center">Error: ${e.message}</div>`;
+            }
+        }
+
+        function showRestaurants() {
+            document.getElementById('restaurantSelectionView').classList.remove('hidden');
+            document.getElementById('menuView').classList.add('hidden');
+        }
+
+        function filterFood(filter) {
+            document.querySelectorAll('.filter-pill').forEach(b => b.classList.toggle('active', b.getAttribute('data-filter') === filter));
+            if (filter === 'all') renderMenu(allItems);
+            else if (filter === 'veg') renderMenu(allItems.filter(i => i.is_veg));
+            else renderMenu(allItems.filter(i => i.category === filter));
+        }
+
+        const foodImages = {
+            'South Indian': 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80',
+            'North Indian': 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80',
+            'Continental': 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=600&q=80',
+            'Chinese': 'https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&w=600&q=80',
+            'Desserts': 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=600&q=80',
+            'Beverages': 'https://images.unsplash.com/photo-1544145945-f904253d0c7e?auto=format&fit=crop&w=600&q=80',
+            'Biryani': 'https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?auto=format&fit=crop&w=600&q=80',
+            'Breakfast': 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80',
+            'Main Course': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+            'Snacks': 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=600&q=80',
+            'Default': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'
+        };
+
+        function renderMenu(items) {
+            const container = document.getElementById('menuContainer');
+            if (items.length === 0) { container.innerHTML = '<div class="text-center py-5">No items found</div>'; return; }
+
+            const categories = {};
+            items.forEach(i => {
+                const cat = i.category || "Specials";
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(i);
+            });
+
+            container.innerHTML = Object.keys(categories).map(cat => {
+                const catItems = categories[cat].map(i => {
+                    const img = i.image_url || foodImages[cat] || foodImages['Default'];
+                    return `
+                    <div class="food-card reveal">
+                        <div class="food-image-box">
+                            <img src="${img}" alt="${i.item_name}" loading="lazy">
+                            <div class="veg-tag ${i.is_veg ? 'veg' : 'nonveg'}"><div class="dot-border"><div class="dot"></div></div></div>
+                        </div>
+                        <div class="food-body">
+                            <h3 class="food-title">${i.item_name}</h3>
+                            <p class="food-desc">${i.description || 'Prepared fresh daily with local ingredients.'}</p>
+                            <div class="food-footer">
+                                <div class="food-price">₹${i.price}</div>
+                                <button class="add-btn" onclick='Cart.type="food"; Cart.add(${JSON.stringify(i).replace(/'/g, "&apos;")})'>ADD</button>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                return `
+                <div class="menu-section">
+                    <div class="menu-section-header"><h3>${cat}</h3><span class="category-count">${categories[cat].length} Items</span></div>
+                    <div class="food-grid">${catItems}</div>
+                </div>`;
+            }).join('');
+            if (window.UI) UI.initInteractivity();
+        }
+
+        async function checkActiveOrder() {
+            if (!Auth.isLoggedIn()) return;
+            try {
+                const res = await apiFetch('/auth/dashboard-summary');
+                const activeOrder = (res.data?.orders || []).find(o => !['delivered', 'cancelled'].includes(o.status));
+                const trackDiv = document.getElementById('orderTracking');
+                if (activeOrder) {
+                    trackDiv.classList.remove('hidden');
+                    renderOrderTracking(activeOrder);
+                } else {
+                    trackDiv.classList.add('hidden');
+                }
+            } catch(e) {}
+        }
+
+        function renderOrderTracking(o) {
+            const statusOrder = ['confirmed', 'preparing', 'ready_for_pickup', 'out_for_delivery', 'delivered'];
+            const currentIndex = statusOrder.indexOf(o.status);
+            const steps = [
+                { label: 'Confirmed', icon: 'ph-receipt' },
+                { label: 'Kitchen', icon: 'ph-cooking-pot' },
+                { label: 'Packed', icon: 'ph-package' },
+                { label: 'On Way', icon: 'ph-bicycle' },
+                { label: 'Arrived', icon: 'ph-check-circle' }
+            ];
+
+            document.getElementById('orderTracking').innerHTML = `
+                <div class="card p-5 reveal active mb-5" style="background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 32px; box-shadow: 0 30px 60px rgba(0,0,0,0.5);">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center gap-4">
+                            <div style="background: rgba(45,90,39,0.1); color: #4ade80; width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                                <i class="ph ${steps[currentIndex]?.icon || 'ph-bowl-food'}"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin:0; font-family:Outfit; font-size:1.4rem; color: white;">Order #${o.id}</h4>
+                                <p style="margin:0; color: #4ade80; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">${o.status.replace(/_/g, ' ')}</p>
+                            </div>
+                        </div>
+                        <span class="badge" style="background: #2D5A27; color: white; padding: 6px 12px; border-radius: 10px; font-weight: 800; font-size: 0.7rem;">LIVE TRACKING</span>
+                    </div>
+                    <div class="stepper">
+                        <div class="stepper-progress" style="width: ${currentIndex / (steps.length - 1) * 100}%"></div>
+                        ${steps.map((s, idx) => `
+                            <div class="step ${idx <= currentIndex ? 'active' : ''} ${idx < currentIndex ? 'completed' : ''}">
+                                <div class="step-icon">
+                                    <i class="ph ${idx < currentIndex ? 'ph-check' : s.icon}"></i>
+                                </div>
+                                <span class="step-label">${s.label}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${o.status === 'placed' || o.status === 'confirmed' ? `
+                    <div class="mt-8 pt-6" style="border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
+                        <button onclick="cancelOrder(${o.id}, event)" class="btn btn-outline" style="border-color: #ef4444; color: #ef4444; padding: 12px 30px; border-radius: 14px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;">
+                            <i class="ph ph-x-circle"></i> Cancel Order
+                        </button>
+                    </div>` : ''}
+                </div>
+            `;
+        }
+
+        async function cancelOrder(id, event) {
+            Swal.fire({
+                title: 'Cancel Order?',
+                text: "Are you sure you want to cancel your yercaud feast? This action cannot be undone.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Yes, Cancel It!',
+                cancelButtonText: 'No, Keep It',
+                background: '#1E293B',
+                color: '#fff'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const btn = event.target.closest('button');
+                        if (btn) {
+                            btn.disabled = true;
+                            btn.innerHTML = '<span class="spinner"></span> Cancelling...';
+                        }
+
+                        const res = await apiFetch(`/auth/orders/${id}/cancel`, { method: 'PUT' });
+                        
+                        if (res.success) {
+                            Toast.show('Order cancelled successfully', 'success');
+                            checkActiveOrder();
+                        } else {
+                            throw new Error(res.error || 'Cancellation failed');
+                        }
+                    } catch (err) {
+                        console.error('Cancel Order Error:', err);
+                        Toast.show(err.message || 'Could not cancel order', 'error');
+                        const btn = document.querySelector(`button[onclick^="cancelOrder"]`);
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="ph ph-x-circle"></i> Cancel Order';
+                        }
+                    }
+                }
+            });
+        }
+
+        async function init() {
+            await loadRestaurants();
+            await checkActiveOrder();
+            setInterval(checkActiveOrder, 15000);
+            Cart.render = function() {
+                const subtotal = this.getTotal();
+                const count = this.items.reduce((sum, i) => sum + i.quantity, 0);
+                document.getElementById('cartSubtotal').textContent = `₹${subtotal.toFixed(2)}`;
+                document.getElementById('cartTotal').textContent = `₹${(subtotal > 0 ? subtotal + 30 : 0).toFixed(2)}`;
+                
+                const float = document.getElementById('cartFloat');
+                if (float) {
+                    float.classList.toggle('active', count > 0);
+                    document.getElementById('floatCount').innerText = `${count} ${count === 1 ? 'Item' : 'Items'}`;
+                    document.getElementById('floatTotal').innerText = `₹${subtotal.toFixed(2)}`;
+                }
+                
+                document.getElementById('cartItems').innerHTML = this.items.map(i => `
+                    <div class="flex justify-between items-center mb-4 p-3" style="background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div><h4 style="margin:0; font-size: 0.95rem; color: white;">${i.item_name}</h4><p style="margin:0; color: var(--text-muted); font-size: 0.8rem;">₹${i.price} × ${i.quantity}</p></div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="Cart.updateQty(${i.id}, -1)" style="background: rgba(255,255,255,0.05); border: none; color: white; width: 28px; height: 28px; border-radius: 8px;">-</button>
+                            <span style="font-weight: 800; color: white;">${i.quantity}</span>
+                            <button onclick="Cart.updateQty(${i.id}, 1)" style="background: var(--primary); border: none; color: white; width: 28px; height: 28px; border-radius: 8px;">+</button>
+                        </div>
+                    </div>
+                `).join('') || '<p class="text-center py-5 text-muted">Your cart is empty</p>';
+            };
+            Cart.render();
+        }
+
+        init();
+    </script>
+</body>
+</html>

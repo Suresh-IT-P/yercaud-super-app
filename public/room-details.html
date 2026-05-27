@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Luxury Stay | Book&Sync Yercaud</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Razorpay script removed -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { 
+            --gold: #C9A84C; 
+            --gold-dark: #A6893A;
+            --gold-light: #F5E6C3;
+            --premium-dark: #0F172A;
+        }
+
+        body { background-color: #F8FAFC; color: var(--premium-dark); }
+
+        .details-wrapper {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem 7rem;
+        }
+
+        .btn-back-luxury {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #64748B;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 2.5rem;
+            transition: all 0.2s;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+        .btn-back-luxury:hover { transform: translateX(-5px); color: var(--gold-dark); }
+
+        /* ═══ Gallery ═══ */
+        .luxury-gallery {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2rem;
+            height: 550px;
+            margin-bottom: 4rem;
+        }
+
+        .main-stage {
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+            min-height: 300px;
+        }
+        .main-stage img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .thumb-strip {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            overflow-y: auto;
+            padding-right: 10px;
+            scrollbar-width: thin;
+        }
+
+        .thumb-item {
+            width: 100%;
+            height: 150px;
+            border-radius: 24px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 4px solid transparent;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .thumb-item.active { border-color: var(--gold); }
+        .thumb-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* ═══ Content Grid ═══ */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 4rem;
+            align-items: flex-start;
+        }
+
+        .stay-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+        .luxury-tag {
+            background: var(--gold-light);
+            color: #856404;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 3rem 0 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-title i { color: var(--gold); }
+
+        .desc-text {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #475569;
+        }
+
+        .amenity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.25rem;
+        }
+        .amenity-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 24px;
+            border: 1px solid #E2E8F0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .amenity-item:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .amenity-item i { font-size: 1.5rem; color: var(--gold); }
+
+        /* ═══ Sidebar ═══ */
+        .booking-sidebar {
+            background: white;
+            border-radius: 40px;
+            padding: 3.5rem;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 120px;
+        }
+
+        .price-hero { margin-bottom: 3rem; }
+        .price-hero .val { font-size: 3rem; font-weight: 800; }
+        .price-hero .unit { font-size: 1rem; color: #64748B; margin-left: 5px; }
+
+        .luxury-form label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #94A3B8;
+            margin: 0 0 10px 5px;
+        }
+        .luxury-form input {
+            width: 100%;
+            padding: 18px 22px;
+            border-radius: 20px;
+            border: 2px solid #F1F5F9;
+            background: #F8FAFC;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .luxury-form input:focus { border-color: var(--gold); background: white; box-shadow: 0 0 0 5px var(--gold-light); }
+
+        .date-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .total-banner {
+            background: #1A4A2E;
+            color: white;
+            padding: 2rem;
+            border-radius: 25px;
+            margin: 3rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .total-banner .price { font-size: 2rem; font-weight: 800; color: var(--gold-light); }
+
+        .btn-reserve {
+            width: 100%;
+            background: linear-gradient(135deg, #C9A84C, #A6893A);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 25px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 15px 35px rgba(201,168,76,0.3);
+        }
+        .btn-reserve:hover { transform: translateY(-5px); box-shadow: 0 20px 45px rgba(201,168,76,0.4); }
+
+        /* ═══════════ RESPONSIVE ═══════════ */
+
+        /* Tablet — stacked content, horizontal thumbs */
+        @media (max-width: 1100px) {
+            .content-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+            .booking-sidebar { position: static; border-radius: 28px; padding: 2.5rem; }
+        }
+
+        @media (max-width: 992px) {
+            .luxury-gallery {
+                grid-template-columns: 1fr;
+                height: auto;
+                gap: 1rem;
+                margin-bottom: 2.5rem;
+            }
+            .main-stage { border-radius: 24px; height: 320px; }
+            .thumb-strip {
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding-right: 0;
+                padding-bottom: 8px;
+                gap: 0.75rem;
+                scrollbar-width: none;
+            }
+            .thumb-strip::-webkit-scrollbar { display: none; }
+            .thumb-item { width: 120px; height: 90px; border-radius: 14px; border-width: 3px; }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .details-wrapper { padding: 1.5rem 1rem 5rem; }
+            .btn-back-luxury { margin-bottom: 1.5rem; font-size: 0.85rem; padding: 6px 12px; }
+
+            .luxury-gallery { margin-bottom: 2rem; }
+            .main-stage { height: 260px; border-radius: 20px; }
+            .thumb-item { width: 100px; height: 75px; border-radius: 12px; }
+
+            .stay-header h1 { font-size: 1.8rem; margin-bottom: 1rem; }
+            .luxury-tag { font-size: 0.65rem; padding: 6px 14px; letter-spacing: 1.5px; margin-bottom: 1rem; }
+
+            .section-title { font-size: 1.15rem; margin: 2rem 0 1rem; }
+            .desc-text { font-size: 1rem; line-height: 1.7; }
+
+            .amenity-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+            .amenity-item { padding: 1rem; border-radius: 16px; font-size: 0.85rem; gap: 10px; }
+            .amenity-item i { font-size: 1.2rem; }
+
+            .booking-sidebar { padding: 2rem 1.5rem; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+            .price-hero { margin-bottom: 2rem; }
+            .price-hero .val { font-size: 2.2rem; }
+            .price-hero .unit { font-size: 0.85rem; }
+
+            .luxury-form input { padding: 14px 16px; font-size: 1rem; border-radius: 16px; margin-bottom: 1.5rem; }
+            .luxury-form label { font-size: 0.7rem; margin-bottom: 8px; }
+
+            .total-banner { padding: 1.5rem; border-radius: 18px; margin: 2rem 0; flex-direction: column; text-align: center; }
+            .total-banner .price { font-size: 1.75rem; }
+            .total-banner span { font-size: 0.75rem; }
+
+            .btn-reserve { padding: 1.2rem; font-size: 1.1rem; border-radius: 18px; }
+        }
+
+        /* Small phone */
+        @media (max-width: 480px) {
+            .details-wrapper { padding: 1rem 0.75rem 4rem; }
+
+            .main-stage { height: 220px; border-radius: 16px; }
+            .thumb-item { width: 85px; height: 65px; border-radius: 10px; }
+
+            .stay-header h1 { font-size: 1.5rem; }
+            .date-row { grid-template-columns: 1fr; gap: 0; }
+
+            .amenity-grid { grid-template-columns: 1fr; }
+            .amenity-item { border-radius: 14px; }
+
+            .booking-sidebar { padding: 1.5rem 1.25rem; border-radius: 20px; }
+            .price-hero .val { font-size: 1.9rem; }
+
+            .luxury-form input { padding: 12px 14px; font-size: 0.95rem; border-radius: 14px; margin-bottom: 1.25rem; }
+            .btn-reserve { padding: 1rem; font-size: 1rem; border-radius: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <nav id="navbar" class="scrolled"></nav>
+
+    <div class="details-wrapper">
+        <a href="rooms" class="btn-back-luxury"><i class="ph ph-arrow-left"></i> Back to Collection</a>
+
+        <div id="loader" class="text-center py-10">
+            <span class="spinner"></span>
+            <p class="mt-4 font-bold text-gold">Finalizing your bespoke stay...</p>
+        </div>
+
+        <div id="content" class="hidden">
+            <div class="luxury-gallery">
+                <div class="main-stage"><img id="mainHero" src="" alt="Suite Interior"></div>
+                <div class="thumb-strip" id="thumbStrip"></div>
+            </div>
+
+            <div class="content-grid">
+                <div class="info-side">
+                    <span class="luxury-tag">Exclusive Signature Stay</span>
+                    <div class="stay-header">
+                        <h1 id="roomTitle">Mountain Majesty Suite</h1>
+                        <p style="font-size:1.2rem; font-weight:600; color:#64748B"><i class="ph ph-map-pin"></i> <span id="hotelLoc">Yercaud Summit</span></p>
+                    </div>
+
+                    <div class="section-title"><i class="ph ph-feather"></i> The Narrative</div>
+                    <p class="desc-text" id="roomDesc">Our signature suites offer an immersive experience into the tranquility of Yercaud. Featuring hand-crafted furnishings and floor-to-ceiling windows, each stay is a story of elegance and hilltop charm.</p>
+
+                    <div class="section-title"><i class="ph ph-diamonds-four"></i> Premier Amenities</div>
+                    <div class="amenity-grid" id="amenityGrid"></div>
+                </div>
+
+                <div class="booking-side">
+                    <div class="booking-sidebar">
+                        <div class="price-hero">
+                            <span style="color:#94A3B8; font-weight:700">Signature Rate</span>
+                            <div class="val">₹<span id="priceVal">0</span><span class="unit">/ night</span></div>
+                        </div>
+
+                        <form id="bookForm" class="luxury-form">
+                            <label>Lead Guest</label>
+                            <input type="text" id="gName" placeholder="Full legal name" required>
+
+                            <div class="date-row">
+                                <div>
+                                    <label>Check-In</label>
+                                    <input type="date" id="cin" required onchange="updateTotal()">
+                                </div>
+                                <div>
+                                    <label>Check-Out</label>
+                                    <input type="date" id="cout" required onchange="updateTotal()">
+                                </div>
+                            </div>
+
+                            <label>Mobile Contact</label>
+                            <input type="tel" id="gPhone" placeholder="+91" required>
+
+                             <label>Electronic Mail</label>
+                             <input type="email" id="gEmail" placeholder="confirmation@luxury.com" required>
+ 
+                             <div id="feeBreakdown" class="hidden" style="margin-bottom: 1.5rem; padding: 15px; background: #F1F5F9; border-radius: 15px; font-size: 0.9rem;">
+                                 <div class="flex justify-between mb-2">
+                                     <span style="color:#64748B">Room Subtotal</span>
+                                     <span id="subtotalPrice" style="font-weight:600">₹0</span>
+                                 </div>
+                                 <div class="flex justify-between">
+                                     <span style="color:#64748B">Platform Fee (5%)</span>
+                                     <span id="platformFeePrice" style="font-weight:600; color:var(--gold)">₹0</span>
+                                 </div>
+                             </div>
+
+                             <div class="total-banner">
+                                 <span style="font-weight:700; text-transform:uppercase; letter-spacing:1px">Total Stay Investment</span>
+                                 <div class="price">₹<span id="totalPrice">0</span></div>
+                             </div>
+
+                            <button type="submit" class="btn-reserve" id="btnBook">Finalize Reservation</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const roomId = new URLSearchParams(window.location.search).get('id');
+        if (!roomId) window.location.href = 'rooms';
+
+        async function loadSuite() {
+            try {
+                const res = await apiFetch(`/rooms/${roomId}`);
+                const r = res.data;
+
+                document.getElementById('roomTitle').textContent = r.room_type;
+                document.getElementById('hotelLoc').textContent = `${r.business_name}, ${r.city}`;
+                document.getElementById('priceVal').textContent = parseFloat(r.price_per_night).toLocaleString();
+                if(r.description) document.getElementById('roomDesc').textContent = r.description;
+
+                // Gallery
+                let imgs = [];
+                try { imgs = (r.images && r.images.startsWith('[')) ? JSON.parse(r.images) : (r.images ? [r.images] : []); } catch(e){}
+                const album = typeof r.album === 'string' ? JSON.parse(r.album || '[]') : (r.album || []);
+                const gallery = imgs.length ? imgs : (album.length ? album : ['https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1200']);
+
+                document.getElementById('mainHero').src = gallery[0];
+                document.getElementById('thumbStrip').innerHTML = gallery.map((url, i) => `
+                    <div class="thumb-item ${i === 0 ? 'active' : ''}" onclick="setHero('${url}', this)">
+                        <img src="${url}">
+                    </div>
+                `).join('');
+
+                // Amenities
+                const raw = (r.amenities || 'WiFi, AC, TV, View, Breakfast').split(',');
+                document.getElementById('amenityGrid').innerHTML = raw.map(a => `
+                    <div class="amenity-item"><i class="ph ph-check-circle"></i> ${a.trim()}</div>
+                `).join('');
+
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+            } catch(e) { Toast.show(e.message, 'error'); }
+        }
+
+        function setHero(url, el) {
+            document.getElementById('mainHero').src = url;
+            document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function updateTotal() {
+            const cin = new Date(document.getElementById('cin').value);
+            const cout = new Date(document.getElementById('cout').value);
+            const nights = Math.max(0, Math.ceil((cout - cin) / (1000 * 60 * 60 * 24)));
+            const rate = parseFloat(document.getElementById('priceVal').textContent.replace(/,/g, ''));
+            
+            if (nights > 0) {
+                const subtotal = nights * rate;
+                const platformFee = Math.round(subtotal * 0.05);
+                const total = subtotal + platformFee;
+
+                document.getElementById('feeBreakdown').classList.remove('hidden');
+                document.getElementById('subtotalPrice').textContent = `₹${subtotal.toLocaleString()}`;
+                document.getElementById('platformFeePrice').textContent = `₹${platformFee.toLocaleString()}`;
+                document.getElementById('totalPrice').textContent = total.toLocaleString();
+            } else {
+                document.getElementById('feeBreakdown').classList.add('hidden');
+                document.getElementById('totalPrice').textContent = '0';
+            }
+        }
+
+        document.getElementById('bookForm').onsubmit = async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btnBook');
+            const orig = btn.innerText;
+            btn.innerHTML = '<span class="spinner"></span> Requesting Booking...';
+            btn.disabled = true;
+
+            try {
+                const total = parseFloat(document.getElementById('totalPrice').textContent.replace(/,/g, ''));
+                if (isNaN(total) || total <= 0) {
+                    throw new Error('Please select valid check-in and check-out dates to calculate pricing');
+                }
+
+                const response = await fetch('/api/send-booking', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'room',
+                        name: document.getElementById('gName').value,
+                        email: document.getElementById('gEmail').value,
+                        phone: document.getElementById('gPhone').value,
+                        details: {
+                            roomType: document.getElementById('roomTitle').textContent,
+                            checkIn: document.getElementById('cin').value,
+                            checkOut: document.getElementById('cout').value,
+                            totalAmount: total,
+                            notes: `Requested Room Stay at ${document.getElementById('hotelLoc').textContent}`
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Booking Inquiry Sent!',
+                        text: 'Your stay request has been dispatched. We will contact you within 2 hours to confirm your reservation and complete booking.',
+                        icon: 'success',
+                        confirmButtonColor: 'var(--gold)'
+                    }).then(() => {
+                        window.location.href = 'rooms.html';
+                    });
+                } else {
+                    throw new Error(data.error || 'Failed to dispatch booking inquiry');
+                }
+            } catch(err) { 
+                Toast.show(err.message, 'error'); 
+                btn.innerHTML = orig; 
+                btn.disabled = false; 
+            }
+        };
+
+        loadSuite();
+    </script>
+</body>
+</html>

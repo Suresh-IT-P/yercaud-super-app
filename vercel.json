@@ -56,6 +56,46 @@
       "dest": "/public/$1"
     },
     {
+      "src": "/(.*\\.html)",
+      "dest": "/public/$1"
+    },
+    {
+      "src": "/index",
+      "dest": "/public/index.html"
+    },
+    {
+      "src": "/rooms",
+      "dest": "/public/rooms.html"
+    },
+    {
+      "src": "/room",
+      "dest": "/public/room.html"
+    },
+    {
+      "src": "/taxi",
+      "dest": "/public/taxi.html"
+    },
+    {
+      "src": "/food",
+      "dest": "/public/food.html"
+    },
+    {
+      "src": "/services",
+      "dest": "/public/services.html"
+    },
+    {
+      "src": "/trip-planner",
+      "dest": "/public/trip-planner.html"
+    },
+    {
+      "src": "/support",
+      "dest": "/public/support.html"
+    },
+    {
+      "src": "/room-details",
+      "dest": "/public/room-details.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/public/index.html"
     }

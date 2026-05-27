@@ -76,10 +76,6 @@
       "dest": "/public/taxi.html"
     },
     {
-      "src": "/food",
-      "dest": "/public/food.html"
-    },
-    {
       "src": "/services",
       "dest": "/public/services.html"
     },

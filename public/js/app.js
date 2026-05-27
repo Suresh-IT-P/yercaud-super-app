@@ -1573,7 +1573,6 @@ const UI = {
             links = `
                 <a href="rooms.html"><i class="ph ph-buildings"></i> Stays</a>
                 <a href="taxi.html"><i class="ph ph-car"></i> Taxis</a>
-                <a href="food.html"><i class="ph ph-hamburger"></i> Food</a>
                 <a href="services.html"><i class="ph ph-sparkles"></i> Celebrations</a>
                 <a href="trip-planner.html" class="text-accent" style="font-weight:600"><i class="ph ph-sparkle"></i> Trip Planner</a>
             `;
@@ -2163,9 +2162,7 @@ document.addEventListener('deviceready', () => {
 document.addEventListener('DOMContentLoaded', () => {
     Cart.init();
 
-    const path = window.location.pathname;
-    const isFoodPage = path.includes('food');
-    UI.renderNavbar(isFoodPage);
+    UI.renderNavbar(false);
     
     // Crucial: Re-render cart after navbar is created to sync counts
     Cart.render();

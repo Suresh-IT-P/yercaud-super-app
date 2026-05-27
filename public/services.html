@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mountain Events & Celebrations | Book&Sync</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .services-intro {
+            text-align: center;
+            margin: 40px auto 20px;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+        .services-intro h1 {
+            font-size: 2.8rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--dark-900);
+            margin-bottom: 12px;
+        }
+        .services-intro p {
+            font-size: 1.1rem;
+            color: #64748b;
+            line-height: 1.6;
+        }
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+            padding: 20px;
+        }
+        .event-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid #f1f5f9;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+        }
+        .event-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--accent);
+        }
+        .event-img-wrapper {
+            position: relative;
+            height: 240px;
+            overflow: hidden;
+        }
+        .event-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .event-card:hover .event-img-wrapper img {
+            transform: scale(1.08);
+        }
+        .event-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            color: var(--accent);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .event-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .event-body h3 {
+            font-size: 1.4rem;
+            font-family: 'Outfit', sans-serif;
+            color: var(--dark-900);
+            margin-bottom: 8px;
+        }
+        .event-body p {
+            font-size: 0.95rem;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        .event-features {
+            list-style: none;
+            margin-bottom: 24px;
+            padding: 0;
+        }
+        .event-features li {
+            font-size: 0.85rem;
+            color: var(--dark-700);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .event-features li i {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        .event-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 16px;
+        }
+        .event-price {
+            font-family: 'Outfit', sans-serif;
+        }
+        .event-price span {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            display: block;
+            text-transform: uppercase;
+        }
+        .event-price b {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav id="navbar"></nav>
+
+    <div style="height: 80px;"></div> <!-- Spacer -->
+
+    <div class="services-intro">
+        <h1>Bespoke Mountain Celebrations</h1>
+        <p>Crafting magical memories above the clouds. Choose a curated setup packages, and let our coordinators take care of the details.</p>
+    </div>
+
+    <!-- EVENTS GRID -->
+    <div class="container">
+        <div class="events-grid">
+            <!-- Card 1: Birthday -->
+            <div class="event-card">
+                <div class="event-img-wrapper">
+                    <span class="event-badge">Celebrations</span>
+                    <img src="img/yercaud_birthday_celebration.png" alt="Birthday Celebration">
+                </div>
+                <div class="event-body">
+                    <h3>Birthday Celebration Setup</h3>
+                    <p>Bespoke room and garden balloon decors, custom matching themed cakes, starlit dining, and premium music systems.</p>
+                    <ul class="event-features">
+                        <li><i class="ph ph-check-circle"></i> Deluxe balloon & floral arrangements</li>
+                        <li><i class="ph ph-check-circle"></i> Custom 1kg designer cake</li>
+                        <li><i class="ph ph-check-circle"></i> Private table setup & ambient lighting</li>
+                        <li><i class="ph ph-check-circle"></i> Photo backdrop & props</li>
+                    </ul>
+                    <div class="event-footer">
+                        <div class="event-price">
+                            <span>Starting from</span>
+                            <b>₹2,499</b>
+                        </div>
+                        <button class="btn btn-primary" onclick="openBookingModal('birthday')">Book Setup</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Anniversary -->
+            <div class="event-card">
+                <div class="event-img-wrapper">
+                    <span class="event-badge">Romantic</span>
+                    <img src="img/yercaud_anniversary_dinner.png" alt="Anniversary Dinner">
+                </div>
+                <div class="event-body">
+                    <h3>Anniversary Candlelight Dinner</h3>
+                    <p>Private luxury table arrangement overlooking the valleys, rose petal walkway, personalized menu, and butler assistance.</p>
+                    <ul class="event-features">
+                        <li><i class="ph ph-check-circle"></i> Rose petal walkway & candlelit tables</li>
+                        <li><i class="ph ph-check-circle"></i> 4-Course gourmet menu for two</li>
+                        <li><i class="ph ph-check-circle"></i> Dedicated private butler service</li>
+                        <li><i class="ph ph-check-circle"></i> Customized greeting card & bouquet</li>
+                    </ul>
+                    <div class="event-footer">
+                        <div class="event-price">
+                            <span>Starting from</span>
+                            <b>₹3,499</b>
+                        </div>
+                        <button class="btn btn-primary" onclick="openBookingModal('anniversary')">Book Setup</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Proposal -->
+            <div class="event-card">
+                <div class="event-img-wrapper">
+                    <span class="event-badge">Luxury Experience</span>
+                    <img src="img/yercaud_mountain_proposal.png" alt="Valley Proposal">
+                </div>
+                <div class="event-body">
+                    <h3>Misty Valley Proposal</h3>
+                    <p>Make it unforgettable with a private proposal deck, neon light decors, matching flower installations, and live acoustic music.</p>
+                    <ul class="event-features">
+                        <li><i class="ph ph-check-circle"></i> Valley-edge private deck access</li>
+                        <li><i class="ph ph-check-circle"></i> "Marry Me" neon sign & arch styling</li>
+                        <li><i class="ph ph-check-circle"></i> Live guitarist performance</li>
+                        <li><i class="ph ph-check-circle"></i> Premium sparkling juice & luxury snacks</li>
+                    </ul>
+                    <div class="event-footer">
+                        <div class="event-price">
+                            <span>Starting from</span>
+                            <b>₹4,999</b>
+                        </div>
+                        <button class="btn btn-primary" onclick="openBookingModal('proposal')">Book Setup</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Custom -->
+            <div class="event-card">
+                <div class="event-img-wrapper">
+                    <span class="event-badge">Tailored</span>
+                    <img src="img/WhatsApp Image 2026-05-10 at 11.03.03 PM (1).jpeg" alt="Custom Services">
+                </div>
+                <div class="event-body">
+                    <h3>Custom Hill Experiences</h3>
+                    <p>Designed strictly based on your ideas: night estate treks, group barbecues, live entertainment, and campfire gatherings.</p>
+                    <ul class="event-features">
+                        <li><i class="ph ph-check-circle"></i> Personalized activities & planning</li>
+                        <li><i class="ph ph-check-circle"></i> Local tribal cultural dances</li>
+                        <li><i class="ph ph-check-circle"></i> Private barbecues & campfires</li>
+                        <li><i class="ph ph-check-circle"></i> Corporate & family team outings</li>
+                    </ul>
+                    <div class="event-footer">
+                        <div class="event-price">
+                            <span>Starting from</span>
+                            <b>On Quote</b>
+                        </div>
+                        <button class="btn btn-primary" onclick="openBookingModal('custom')">Inquire Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOOKING MODAL -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="close-btn" onclick="closeBookingModal()"><i class="ph ph-x"></i></button>
+            <h2 id="modalTitle" style="font-family:'Outfit'; margin-bottom: 0.5rem;">Book Celebration Setup</h2>
+            <p class="text-muted mb-4">Complete the request details. Our event manager will contact you to coordinate.</p>
+            
+            <form id="eventForm" onsubmit="submitEventRequest(event)">
+                <input type="hidden" id="eventType">
+                
+                <div class="form-group">
+                    <label>Traveler Name</label>
+                    <input type="text" id="custName" required placeholder="Enter full name" style="padding:1rem; border-radius:14px; border:1.5px solid #E2E8F0; width:100%">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="custPhone" required placeholder="Enter 10-digit mobile number" style="padding:1rem; border-radius:14px; border:1.5px solid #E2E8F0; width:100%">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="custEmail" required placeholder="Enter email address" style="padding:1rem; border-radius:14px; border:1.5px solid #E2E8F0; width:100%">
+                </div>
+                <div class="form-group">
+                    <label>Event Date</label>
+                    <input type="date" id="eventDate" required style="padding:1rem; border-radius:14px; border:1.5px solid #E2E8F0; width:100%">
+                </div>
+                <div class="form-group">
+                    <label>Setup Preference / Details</label>
+                    <textarea id="eventNotes" placeholder="Describe any theme, cake flavors, or specific arrangements you prefer..." style="padding:1rem; border-radius:14px; border:1.5px solid #E2E8F0; width:100%; height:100px; resize:none;"></textarea>
+                </div>
+                
+                <button type="submit" id="eventSubmitBtn" class="btn btn-primary btn-full" style="padding: 1rem; font-size: 1.1rem; margin-top: 1rem;">
+                    <i class="ph ph-sparkle"></i> Send Request
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="ph ph-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="rooms.html" class="nav-item">
+            <i class="ph ph-buildings"></i>
+            <span>Stays</span>
+        </a>
+        <a href="support.html" class="nav-item">
+            <i class="ph ph-headphones"></i>
+            <span>Support</span>
+        </a>
+    </nav>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Setup Swal Fallback for Offline use
+        if (typeof Swal === 'undefined') {
+            window.Swal = {
+                fire: function(options) {
+                    alert((options.title || '') + '\n' + (options.text || ''));
+                    return Promise.resolve({ isConfirmed: true });
+                }
+            };
+        }
+
+        UI.renderNavbar(false);
+
+        function openBookingModal(type) {
+            document.getElementById('eventType').value = type;
+            let displayTitle = "Book Celebration";
+            if (type === 'birthday') displayTitle = "Book Birthday Setup";
+            else if (type === 'anniversary') displayTitle = "Book Anniversary Dinner";
+            else if (type === 'proposal') displayTitle = "Book Mountain Proposal";
+            else if (type === 'custom') displayTitle = "Inquire Custom Experience";
+            
+            document.getElementById('modalTitle').textContent = displayTitle;
+            document.getElementById('eventModal').classList.add('active');
+        }
+
+        function closeBookingModal() {
+            document.getElementById('eventModal').classList.remove('active');
+            document.getElementById('eventForm').reset();
+        }
+
+        async function submitEventRequest(e) {
+            e.preventDefault();
+            const btn = document.getElementById('eventSubmitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Dispatching request...';
+
+            const type = document.getElementById('eventType').value;
+            const name = document.getElementById('custName').value;
+            const phone = document.getElementById('custPhone').value;
+            const email = document.getElementById('custEmail').value;
+            const date = document.getElementById('eventDate').value;
+            const notes = document.getElementById('eventNotes').value;
+
+            try {
+                const response = await fetch('/api/send-booking', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: type,
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        details: {
+                            setupPreference: type.toUpperCase() + ' SETUP',
+                            date: date,
+                            notes: notes
+                        }
+                    })
+                });
+
+                const res = await response.json();
+                if (res.success) {
+                    Swal.fire({
+                        title: 'Request Sent!',
+                        text: 'Your celebration setup inquiry has been submitted. Our team will contact you shortly.',
+                        icon: 'success',
+                        confirmButtonColor: 'var(--primary)',
+                        confirmButtonText: 'Great!'
+                    }).then(() => {
+                        closeBookingModal();
+                    });
+                } else {
+                    throw new Error(res.error || 'Failed to dispatch request');
+                }
+            } catch (err) {
+                alert(err.message || 'Error occurred while sending request');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ph ph-sparkle"></i> Send Request';
+            }
+        }
+    </script>
+</body>
+</html>

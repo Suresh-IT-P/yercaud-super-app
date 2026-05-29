@@ -236,9 +236,96 @@ function initMockData() {
         ]);
 
         mockDB.set('rooms', [
-            { id: 201, resort_name: "Sterling Yercaud", business_name: "Sterling Yercaud", room_type: "Classic Room", price: 4500, price_per_night: 4500, rating: 4.4, city: "Yercaud", image_url: "https://images.unsplash.com/photo-1611891404724-497bd63d0985?auto=format&fit=crop&w=600&q=80", description: "Beautiful garden facing room with king size bed.", amenities: "Free Wi-Fi, Mini Bar, Mountain View" },
-            { id: 202, resort_name: "Grange Resort", business_name: "Grange Resort", room_type: "Safari Cabin", price: 6000, price_per_night: 6000, rating: 4.6, city: "Yercaud", image_url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80", description: "Rustic wooden cabin nestled in coffee plantations.", amenities: "Free Breakfast, Fireplace, Eco-friendly" },
-            { id: 203, resort_name: "Grand Palace Hotel", business_name: "Grand Palace Hotel", room_type: "Valley View Suite", price: 8500, price_per_night: 8500, rating: 4.8, city: "Yercaud", image_url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=600&q=80", description: "Luxurious suite offering breathtaking panoramic views of Shevaroy hills.", amenities: "Jacuzzi, Private Balcony, Valley View, Room Service" }
+            {
+                id: 201,
+                resort_name: "Sterling Yercaud",
+                business_name: "Sterling Yercaud",
+                room_type: "Classic Garden Room",
+                price: 4500,
+                price_per_night: 4500,
+                rating: 4.4,
+                city: "Yercaud",
+                image_url: "img/rooms/r1/1.jpeg",
+                images: JSON.stringify(["img/rooms/r1/1.jpeg", "img/rooms/r1/2.jpeg", "img/rooms/r1/3.jpeg", "img/rooms/r1/4.jpeg", "img/rooms/r1/5.jpeg", "img/rooms/r1/6.jpeg", "img/rooms/r1/7.jpeg", "img/rooms/r1/8.jpeg"]),
+                album: ["img/rooms/r1/1.jpeg", "img/rooms/r1/2.jpeg", "img/rooms/r1/3.jpeg", "img/rooms/r1/4.jpeg", "img/rooms/r1/5.jpeg", "img/rooms/r1/6.jpeg", "img/rooms/r1/7.jpeg", "img/rooms/r1/8.jpeg"],
+                description: "Beautiful garden facing room with king size bed and private seating.",
+                amenities: "Free Wi-Fi, Mini Bar, Mountain View, Breakfast"
+            },
+            {
+                id: 202,
+                resort_name: "Grange Resort",
+                business_name: "Grange Resort",
+                room_type: "Safari Wooden Cabin",
+                price: 6000,
+                price_per_night: 6000,
+                rating: 4.6,
+                city: "Yercaud",
+                image_url: "img/rooms/r2/1.jpeg",
+                images: JSON.stringify(["img/rooms/r2/1.jpeg", "img/rooms/r2/2.jpeg", "img/rooms/r2/3.jpeg", "img/rooms/r2/4.jpeg", "img/rooms/r2/5.jpeg", "img/rooms/r2/6.jpeg", "img/rooms/r2/7.jpeg"]),
+                album: ["img/rooms/r2/1.jpeg", "img/rooms/r2/2.jpeg", "img/rooms/r2/3.jpeg", "img/rooms/r2/4.jpeg", "img/rooms/r2/5.jpeg", "img/rooms/r2/6.jpeg", "img/rooms/r2/7.jpeg"],
+                description: "Rustic wooden cabin nestled in lush coffee plantations.",
+                amenities: "Free Breakfast, Fireplace, Eco-friendly, Private Balcony"
+            },
+            {
+                id: 203,
+                resort_name: "Grand Palace Hotel",
+                business_name: "Grand Palace Hotel",
+                room_type: "Valley View Suite",
+                price: 8500,
+                price_per_night: 8500,
+                rating: 4.8,
+                city: "Yercaud",
+                image_url: "img/rooms/r3/1.jpeg",
+                images: JSON.stringify(["img/rooms/r3/1.jpeg", "img/rooms/r3/2.jpeg", "img/rooms/r3/3.jpeg", "img/rooms/r3/4.jpeg", "img/rooms/r3/5.jpeg", "img/rooms/r3/6.jpeg", "img/rooms/r3/7.jpeg"]),
+                album: ["img/rooms/r3/1.jpeg", "img/rooms/r3/2.jpeg", "img/rooms/r3/3.jpeg", "img/rooms/r3/4.jpeg", "img/rooms/r3/5.jpeg", "img/rooms/r3/6.jpeg", "img/rooms/r3/7.jpeg"],
+                description: "Luxurious suite offering breathtaking panoramic views of Shevaroy hills.",
+                amenities: "Jacuzzi, Private Balcony, Valley View, Room Service, AC"
+            },
+            {
+                id: 204,
+                resort_name: "Great Trails Yercaud",
+                business_name: "Great Trails Yercaud by GRT",
+                room_type: "Luxury Sky Villa",
+                price: 9500,
+                price_per_night: 9500,
+                rating: 4.7,
+                city: "Yercaud",
+                image_url: "img/rooms/r4/1.jpeg",
+                images: JSON.stringify(["img/rooms/r4/1.jpeg", "img/rooms/r4/2.jpeg", "img/rooms/r4/3.jpeg", "img/rooms/r4/4.jpeg", "img/rooms/r4/5.jpeg", "img/rooms/r4/6.jpeg", "img/rooms/r4/7.jpeg"]),
+                album: ["img/rooms/r4/1.jpeg", "img/rooms/r4/2.jpeg", "img/rooms/r4/3.jpeg", "img/rooms/r4/4.jpeg", "img/rooms/r4/5.jpeg", "img/rooms/r4/6.jpeg", "img/rooms/r4/7.jpeg"],
+                description: "Suspended style villa offering an immersive mountain stay experience.",
+                amenities: "Free Wi-Fi, Coffee Maker, Infinity Pool Access, Valet Parking"
+            },
+            {
+                id: 205,
+                resort_name: "Rock Perch Resort",
+                business_name: "Rock Perch Resort",
+                room_type: "Premium Mountain Suite",
+                price: 7200,
+                price_per_night: 7200,
+                rating: 4.5,
+                city: "Yercaud",
+                image_url: "img/rooms/r5/1.jpeg",
+                images: JSON.stringify(["img/rooms/r5/1.jpeg", "img/rooms/r5/2.jpeg", "img/rooms/r5/3.jpeg", "img/rooms/r5/4.jpeg", "img/rooms/r5/5.jpeg", "img/rooms/r5/6.jpeg", "img/rooms/r5/7.jpeg", "img/rooms/r5/8.jpeg"]),
+                album: ["img/rooms/r5/1.jpeg", "img/rooms/r5/2.jpeg", "img/rooms/r5/3.jpeg", "img/rooms/r5/4.jpeg", "img/rooms/r5/5.jpeg", "img/rooms/r5/6.jpeg", "img/rooms/r5/7.jpeg", "img/rooms/r5/8.jpeg"],
+                description: "Perched on the edge of the hill, offering spectacular sunset views.",
+                amenities: "Wi-Fi, Mini Bar, Flat TV, Bath Tub, Fireplace"
+            },
+            {
+                id: 206,
+                resort_name: "Shevaroys Hotel",
+                business_name: "Shevaroys Hotel",
+                room_type: "Executive Family Cottage",
+                price: 5500,
+                price_per_night: 5500,
+                rating: 4.3,
+                city: "Yercaud",
+                image_url: "img/rooms/r6/1.jpeg",
+                images: JSON.stringify(["img/rooms/r6/1.jpeg", "img/rooms/r6/2.jpeg", "img/rooms/r6/3.jpeg", "img/rooms/r6/4.jpeg", "img/rooms/r6/5.jpeg", "img/rooms/r6/6.jpeg", "img/rooms/r6/7.jpeg", "img/rooms/r6/8.jpeg"]),
+                album: ["img/rooms/r6/1.jpeg", "img/rooms/r6/2.jpeg", "img/rooms/r6/3.jpeg", "img/rooms/r6/4.jpeg", "img/rooms/r6/5.jpeg", "img/rooms/r6/6.jpeg", "img/rooms/r6/7.jpeg", "img/rooms/r6/8.jpeg"],
+                description: "Spacious multi-bedroom cottage perfect for families and group getaways.",
+                amenities: "Kitchenette, Free Wi-Fi, Garden Seating, Kids Play Area"
+            }
         ]);
 
         mockDB.set('offers', [
